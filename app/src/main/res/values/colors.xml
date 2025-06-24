@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#FFFFFF</color>
+    <color name="text">#000000</color>
+    <color name="primary">#000000</color>
+    <color name="onPrimary">#FFFFFF</color>
+
+    <color name="light_gray">#F0F0F0</color>
+    <color name="precio_color">#388E3C</color>        <!-- verde oscuro -->
+    <color name="descuento_color">#D32F2F</color>     <!-- rojo oscuro -->
+
+    <color name="footerBackground">#1A1A1A</color> <!-- gris oscuro -->
+    <color name="footerText">#FFFFFF</color>
+    <color name="footerBorder">#444444</color>
+
+    <!-- Colores para filtros -->
+    <color name="filter_background">#FFFFFF</color>
+    <color name="filter_text">#000000</color>
+    <color name="filter_hint">#757575</color>
+    <color name="filter_border">#E0E0E0</color>
+    <color name="filter_input_background">#F5F5F5</color>
+
+</resources>
+

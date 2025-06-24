@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="@dimen/padding_medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Imagen del producto -->
+            <ImageView
+                android:id="@+id/imageProducto"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/image_large"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/product_image"
+                android:background="@android:color/darker_gray"
+                android:layout_marginBottom="@dimen/margin_large"/>
+
+            <!-- Etiqueta de descuento -->
+            <TextView
+                android:id="@+id/textDescuento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_descuento"
+                android:padding="@dimen/padding_medium"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_medium"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:layout_marginBottom="@dimen/margin_medium"/>
+
+            <!-- Nombre del producto -->
+            <TextView
+                android:id="@+id/textNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nombre del Producto"
+                android:textSize="@dimen/text_title"
+                android:textStyle="bold"
+                android:textColor="?android:textColorPrimary"
+                android:layout_marginBottom="@dimen/margin_medium"/>
+
+            <!-- Descripción -->
+            <TextView
+                android:id="@+id/textDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Descripción del producto"
+                android:textSize="@dimen/text_medium"
+                android:textColor="?android:textColorSecondary"
+                android:layout_marginBottom="@dimen/margin_large"/>
+
+            <!-- Información del producto -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_popup"
+                android:padding="@dimen/padding_medium"
+                android:layout_marginBottom="@dimen/margin_large">
+
+                <!-- Categoría -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="@dimen/margin_medium">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Categoría:"
+                        android:textSize="@dimen/text_medium"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="@dimen/margin_medium"/>
+
+                    <TextView
+                        android:id="@+id/textCategoria"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Anime"
+                        android:textSize="@dimen/text_medium"/>
+                </LinearLayout>
+
+                <!-- Tipo -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="@dimen/margin_medium">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tipo:"
+                        android:textSize="@dimen/text_medium"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="@dimen/margin_medium"/>
+
+                    <TextView
+                        android:id="@+id/textTipo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Polo"
+                        android:textSize="@dimen/text_medium"/>
+                </LinearLayout>
+
+                <!-- ID del producto -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ID:"
+                        android:textSize="@dimen/text_medium"
+                        android:textStyle="bold"
+                        android:layout_marginEnd="@dimen/margin_medium"/>
+
+                    <TextView
+                        android:id="@+id/textId"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="1"
+                        android:textSize="@dimen/text_medium"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Precios -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/margin_large">
+
+                <!-- Precio original (tachado) -->
+                <TextView
+                    android:id="@+id/textPrecioOriginal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="S/ 70.00"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="@dimen/text_xlarge"
+                    android:visibility="gone"
+                    android:layout_marginEnd="@dimen/margin_medium"/>
+
+                <!-- Precio con descuento -->
+                <TextView
+                    android:id="@+id/textPrecio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="S/ 55.00"
+                    android:textColor="@color/precio_color"
+                    android:textSize="@dimen/text_title"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <!-- Botones de acción -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/margin_large">
+
+                <Button
+                    android:id="@+id/btnAgregar"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height_large"
+                    android:layout_weight="1"
+                    android:text="Agregar al Carrito"
+                    android:textSize="@dimen/text_medium"
+                    android:layout_marginEnd="@dimen/margin_small"/>
+
+                <Button
+                    android:id="@+id/btnComprar"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height_large"
+                    android:layout_weight="1"
+                    android:text="Comprar Ahora"
+                    android:textSize="@dimen/text_medium"
+                    android:layout_marginStart="@dimen/margin_small"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout> 

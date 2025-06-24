@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_perfil"
+        android:icon="@drawable/ic_user_dark"
+        android:title="Perfil" />
+
+    <item
+        android:id="@+id/menu_pedidos"
+        android:icon="@drawable/ic_pedidos_dark"
+        android:title="Pedidos" />
+
+    <item
+        android:id="@+id/menu_disenos"
+        android:icon="@drawable/ic_disenos_dark"
+        android:title="Diseños" />
+
+    <item
+        android:id="@+id/menu_direcciones"
+        android:icon="@drawable/ic_direccion_dark"
+        android:title="Direcciones" />
+
+    <item
+        android:id="@+id/menu_metodos_pago"
+        android:icon="@drawable/ic_pago_dark"
+        android:title="Métodos de Pago" />
+
+    <item
+        android:id="@+id/menu_toggle_theme"
+        android:icon="@drawable/ic_moon"
+        android:title="Modo Oscuro" />
+
+    <item
+        android:id="@+id/menu_cerrar_sesion"
+        android:icon="@drawable/ic_logout_dark"
+        android:title="Cerrar sesión" />
+</menu>

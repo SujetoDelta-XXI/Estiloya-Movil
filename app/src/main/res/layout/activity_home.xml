@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="@dimen/padding_medium"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Mensaje de bienvenida -->
+    <TextView
+        android:id="@+id/tvWelcome"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Bienvenido a EstiloYa"
+        android:textSize="@dimen/text_title"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/margin_large" />
+
+    <!-- Contenedor central -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="0">
+
+        <!-- Botón o icono para ir a Productos -->
+        <ImageButton
+            android:id="@+id/iconProductos"
+            android:layout_width="@dimen/icon_xlarge"
+            android:layout_height="@dimen/icon_xlarge"
+            android:src="@drawable/ic_productos_light"
+            android:contentDescription="Ver productos"
+            android:background="?selectableItemBackgroundBorderless"
+            android:padding="@dimen/padding_small" />
+
+        <!-- Texto aclaratorio bajo el ícono -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ir a Productos"
+            android:textSize="@dimen/text_medium"
+            android:layout_marginTop="@dimen/margin_medium"/>
+
+    </LinearLayout>
+
+    <!-- Espacio inferior -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

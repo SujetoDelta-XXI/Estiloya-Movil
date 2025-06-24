@@ -1,0 +1,35 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Estiloya</string>
+    <string name="perfil">Perfil</string>
+    <string name="pedidos">Pedidos</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_productos">Productos</string>
+    <string name="nav_disenar">Diseñar</string>
+
+    <!--Producto-->
+    <string name="product_image">Imagen del producto</string>
+    <string name="placeholder_nombre">Nombre del producto</string>
+    <string name="placeholder_descripcion">Descripción breve</string>
+    <string name="placeholder_precio">S/ 0.00</string>
+    <string name="placeholder_descuento">-0% OFF</string>
+    <string name="placeholder_categoria">Categoría</string>
+    <string name="placeholder_tipo">Tipo</string>
+    <string name="accessibility_product_list">Lista de productos</string>
+
+    <string name="login">Login</string>
+    <string name="registro">Registro</string>
+
+    <!-- Filtros de productos -->
+    <string name="filter_title">Filtros de Productos</string>
+    <string name="filter_price_range">Rango de Precio</string>
+    <string name="filter_price_min_hint">Precio mínimo</string>
+    <string name="filter_price_max_hint">Precio máximo</string>
+    <string name="filter_category">Categoría</string>
+    <string name="filter_type">Tipo</string>
+    <string name="filter_apply">Aplicar Filtros</string>
+    <string name="filter_all_categories">Todas las categorías</string>
+    <string name="filter_all_types">Todos los tipos</string>
+    <string name="filter_no_results">No se encontraron productos</string>
+    <string name="filter_results_found">%d productos encontrados</string>
+
+</resources>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="@dimen/padding_medium"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Título de la pantalla -->
+    <TextView
+        android:id="@+id/tvProductosTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/filter_title"
+        android:textSize="@dimen/text_title"
+        android:textStyle="bold"
+        android:textColor="@color/text"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/margin_medium"/>
+
+    <!-- Filtros -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_filter_container"
+        android:padding="@dimen/padding_medium"
+        android:layout_marginBottom="@dimen/margin_medium">
+
+        <!-- Rango de precio -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_price_range"
+            style="@style/FilterTitle"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/margin_medium">
+
+            <EditText
+                android:id="@+id/etPrecioMin"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:hint="@string/filter_price_min_hint"
+                android:inputType="numberDecimal"
+                android:textSize="@dimen/text_small"
+                android:padding="@dimen/padding_small"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:background="@drawable/bg_filter_input"
+                android:textColor="@color/filter_text"
+                android:textColorHint="@color/filter_hint"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-"
+                android:textSize="@dimen/text_medium"
+                android:textColor="@color/filter_text"
+                android:layout_marginHorizontal="@dimen/margin_small"/>
+
+            <EditText
+                android:id="@+id/etPrecioMax"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:hint="@string/filter_price_max_hint"
+                android:inputType="numberDecimal"
+                android:textSize="@dimen/text_small"
+                android:padding="@dimen/padding_small"
+                android:layout_marginStart="@dimen/margin_small"
+                android:background="@drawable/bg_filter_input"
+                android:textColor="@color/filter_text"
+                android:textColorHint="@color/filter_hint"/>
+        </LinearLayout>
+
+        <!-- Categoría y Tipo en la misma fila -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/margin_medium">
+
+            <!-- Categoría -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginEnd="@dimen/margin_small">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/filter_category"
+                    style="@style/FilterTitle"/>
+
+                <Spinner
+                    android:id="@+id/spinnerCategoria"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:background="@drawable/bg_filter_input"
+                    android:popupBackground="@color/filter_background"/>
+
+            </LinearLayout>
+
+            <!-- Tipo -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="@dimen/margin_small">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/filter_type"
+                    style="@style/FilterTitle"/>
+
+                <Spinner
+                    android:id="@+id/spinnerTipo"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/button_height"
+                    android:background="@drawable/bg_filter_input"
+                    android:popupBackground="@color/filter_background"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Botón aplicar filtros -->
+        <Button
+            android:id="@+id/btnAplicarFiltros"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:text="@string/filter_apply"
+            android:textSize="@dimen/text_medium"
+            android:backgroundTint="@color/primary"
+            android:textColor="@color/onPrimary"/>
+
+    </LinearLayout>
+
+    <!-- RecyclerView para mostrar productos -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvProductos"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/padding_medium" />
+
+</LinearLayout>

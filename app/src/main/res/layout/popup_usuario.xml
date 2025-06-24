@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="?attr/popupBackgroundColor"
+        android:padding="@dimen/padding_medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="@dimen/popup_width">
+
+        <!-- Opción: Perfil -->
+        <LinearLayout style="@style/PopupItemContainer">
+            <ImageView
+                android:id="@+id/iconPerfil"
+                style="@style/PopupIcon" />
+            <TextView
+                android:id="@+id/opPerfil"
+                android:text="Perfil"
+                style="@style/PopupText" />
+        </LinearLayout>
+
+        <!-- Opción: Pedidos -->
+        <LinearLayout style="@style/PopupItemContainer">
+            <ImageView
+                android:id="@+id/iconPedidos"
+                style="@style/PopupIcon" />
+            <TextView
+                android:id="@+id/opPedidos"
+                android:text="Pedidos"
+                style="@style/PopupText" />
+        </LinearLayout>
+
+        <!-- Opción: Diseños -->
+        <LinearLayout style="@style/PopupItemContainer">
+            <ImageView
+                android:id="@+id/iconDisenos"
+                style="@style/PopupIcon" />
+            <TextView
+                android:id="@+id/opDisenos"
+                android:text="Diseños"
+                style="@style/PopupText" />
+        </LinearLayout>
+
+        <!-- Opción: Direcciones -->
+        <LinearLayout style="@style/PopupItemContainer">
+            <ImageView
+                android:id="@+id/iconDirecciones"
+                style="@style/PopupIcon" />
+            <TextView
+                android:id="@+id/opDirecciones"
+                android:text="Direcciones"
+                style="@style/PopupText" />
+        </LinearLayout>
+
+        <!-- Opción: Métodos de Pago -->
+        <LinearLayout style="@style/PopupItemContainer">
+            <ImageView
+                android:id="@+id/iconPagos"
+                style="@style/PopupIcon" />
+            <TextView
+                android:id="@+id/opPagos"
+                android:text="Métodos de pago"
+                style="@style/PopupText" />
+        </LinearLayout>
+
+        <!-- Separador -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginVertical="@dimen/margin_small" />
+
+        <!-- Switch Tema -->
+        <LinearLayout style="@style/PopupItemContainer">
+            <ImageView
+                android:id="@+id/iconTheme"
+                style="@style/PopupIcon" />
+            <TextView
+                android:id="@+id/tvModo"
+                android:text="Modo oscuro"
+                style="@style/PopupText" />
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_medium" />
+        </LinearLayout>
+
+        <!-- Opción: Cerrar sesión / Iniciar sesión -->
+        <LinearLayout
+            style="@style/PopupItemContainer">
+            <ImageView
+                android:id="@+id/iconLogout"
+                style="@style/PopupIcon" />
+            <TextView
+                android:id="@+id/opLogout"
+                android:text="Cerrar sesión"
+                style="@style/PopupText" />
+        </LinearLayout>
+    </LinearLayout>
+</layout>
