@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="?selectableItemBackground"
+    android:padding="@dimen/padding_medium"
+    android:layout_margin="@dimen/margin_small">
+
+    <ImageView
+        android:id="@+id/ivCategoriaIcono"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="@dimen/padding_small"
+        android:background="@drawable/bg_circle_primary" />
+
+    <TextView
+        android:id="@+id/tvCategoriaNombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Categoría"
+        android:textSize="@dimen/text_small"
+        android:layout_marginTop="@dimen/margin_small"
+        android:gravity="center" />
+
+</LinearLayout> 

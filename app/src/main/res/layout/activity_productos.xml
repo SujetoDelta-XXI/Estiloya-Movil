@@ -145,13 +145,29 @@
 
     </LinearLayout>
 
-    <!-- RecyclerView para mostrar productos -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvProductos"
+    <!-- Contenedor para RecyclerView + ProgressBar -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="@dimen/padding_medium" />
+        android:layout_weight="1">
+
+        <!-- RecyclerView para mostrar productos -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvProductos"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/padding_medium" />
+
+        <!-- ProgressBar centrado sobre el RecyclerView -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+
+    </FrameLayout>
 
 </LinearLayout>

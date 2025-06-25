@@ -12,7 +12,7 @@ import com.asparrin.carlos.estiloya.databinding.ItemProductoBinding
 import com.bumptech.glide.Glide
 
 class ProductosAdapter(
-    private val productos: List<Producto>,
+    private var productos: List<Producto>,
     private val onProductoClick: (Producto) -> Unit,
     private val onAgregarClick: (Producto) -> Unit,
     private val onComprarClick: (Producto) -> Unit
@@ -36,26 +36,22 @@ class ProductosAdapter(
                 .error(R.drawable.ic_producto_dark)
                 .into(binding.imageProducto)
             
-            // Configurar precios y descuento
-            if (producto.descuento > 0) {
-                // Mostrar descuento
-                binding.textDescuento.visibility = View.VISIBLE
-                binding.textDescuento.text = "-${producto.descuento}%"
-                
-                // Mostrar precio original tachado
-                binding.textPrecioOriginal.visibility = View.VISIBLE
-                binding.textPrecioOriginal.text = "S/ ${String.format("%.2f", producto.precio)}"
-                binding.textPrecioOriginal.paintFlags = 
-                    binding.textPrecioOriginal.paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
-                
-                // Calcular y mostrar precio con descuento
-                val precioConDescuento = producto.precio * (1 - producto.descuento / 100.0)
-                binding.textPrecio.text = "S/ ${String.format("%.2f", precioConDescuento)}"
+            // Descuento y precios
+            if (producto.descuentoPorcentajeCalculado > 0) {
+                binding.textDescuento.apply {
+                    visibility = View.VISIBLE
+                    text = "-${producto.descuentoPorcentajeCalculado}%"
+                }
+                binding.textPrecioOriginal.apply {
+                    visibility = View.VISIBLE
+                    text = "S/ ${"%.2f".format(producto.precio)}"
+                    paintFlags = paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
+                }
+                binding.textPrecio.text = "S/ ${"%.2f".format(producto.precioConDescuento)}"
             } else {
-                // Sin descuento
                 binding.textDescuento.visibility = View.GONE
                 binding.textPrecioOriginal.visibility = View.GONE
-                binding.textPrecio.text = "S/ ${String.format("%.2f", producto.precio)}"
+                binding.textPrecio.text = "S/ ${"%.2f".format(producto.precio)}"
             }
             
             // Configurar click listeners
@@ -80,4 +76,9 @@ class ProductosAdapter(
     }
 
     override fun getItemCount(): Int = productos.size
+
+    fun updateData(nuevosProductos: List<Producto>) {
+        productos = nuevosProductos
+        notifyDataSetChanged()
+    }
 }

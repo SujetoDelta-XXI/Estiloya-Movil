@@ -1,56 +1,349 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="@dimen/padding_medium"
-    android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Mensaje de bienvenida -->
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Bienvenido a EstiloYa"
-        android:textSize="@dimen/text_title"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="@dimen/margin_large" />
+    <!-- AppBar con Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <!-- Contenedor central -->
+        <!-- Logo/Nombre de la app -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="EstiloYa"
+            android:textColor="@color/onPrimary"
+            android:textSize="@dimen/text_large"
+            android:textStyle="bold"
+            android:gravity="start|center_vertical" />
+
+        <!-- Ícono de búsqueda -->
+        <ImageButton
+            android:id="@+id/btnSearch"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_search"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="Buscar"
+            android:tint="@color/onPrimary" />
+
+        <!-- Ícono de perfil/notificaciones -->
+        <ImageButton
+            android:id="@+id/btnProfile"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_user_light"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="Perfil"
+            android:tint="@color/onPrimary" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Barra de búsqueda fija -->
     <LinearLayout
+        android:id="@+id/searchContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_weight="0">
+        android:orientation="horizontal"
+        android:background="@color/surface"
+        android:padding="@dimen/padding_small"
+        android:visibility="gone">
 
-        <!-- Botón o icono para ir a Productos -->
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:hint="¿Qué buscas hoy?"
+            android:background="@drawable/bg_search_input"
+            android:paddingStart="@dimen/padding_medium"
+            android:paddingEnd="@dimen/padding_medium"
+            android:textSize="@dimen/text_small"
+            android:inputType="text"
+            android:imeOptions="actionSearch" />
+
         <ImageButton
-            android:id="@+id/iconProductos"
-            android:layout_width="@dimen/icon_xlarge"
-            android:layout_height="@dimen/icon_xlarge"
-            android:src="@drawable/ic_productos_light"
-            android:contentDescription="Ver productos"
+            android:id="@+id/btnSearchAction"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_search"
             android:background="?selectableItemBackgroundBorderless"
-            android:padding="@dimen/padding_small" />
-
-        <!-- Texto aclaratorio bajo el ícono -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ir a Productos"
-            android:textSize="@dimen/text_medium"
-            android:layout_marginTop="@dimen/margin_medium"/>
+            android:contentDescription="Buscar"
+            android:layout_marginStart="@dimen/margin_small" />
 
     </LinearLayout>
 
-    <!-- Espacio inferior -->
-    <View
+    <!-- Contenido principal -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1">
 
-</LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/padding_medium">
+
+            <!-- Slider de banners (ViewPager2) -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/viewPagerBanners"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="@dimen/margin_medium" />
+
+            <!-- Indicador de páginas para el ViewPager -->
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayoutBanners"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabBackground="@drawable/tab_selector"
+                app:tabGravity="center"
+                app:tabIndicatorHeight="0dp"
+                android:layout_marginBottom="@dimen/margin_large" />
+
+            <!-- Accesos rápidos (Quick Actions) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="@dimen/margin_large">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Accesos Rápidos"
+                    android:textSize="@dimen/text_large"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="@dimen/margin_medium" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <!-- Categorías -->
+                    <LinearLayout
+                        android:id="@+id/btnCategorias"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="?selectableItemBackground"
+                        android:padding="@dimen/padding_small">
+
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_categoria"
+                            android:background="@drawable/bg_circle_primary"
+                            android:padding="@dimen/padding_small" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Categorías"
+                            android:textSize="@dimen/text_small"
+                            android:layout_marginTop="@dimen/margin_small" />
+
+                    </LinearLayout>
+
+                    <!-- Ofertas -->
+                    <LinearLayout
+                        android:id="@+id/btnOfertas"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="?selectableItemBackground"
+                        android:padding="@dimen/padding_small">
+
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_oferta"
+                            android:background="@drawable/bg_circle_accent"
+                            android:padding="@dimen/padding_small" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ofertas"
+                            android:textSize="@dimen/text_small"
+                            android:layout_marginTop="@dimen/margin_small" />
+
+                    </LinearLayout>
+
+                    <!-- Nuevos productos -->
+                    <LinearLayout
+                        android:id="@+id/btnNuevos"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="?selectableItemBackground"
+                        android:padding="@dimen/padding_small">
+
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_nuevo"
+                            android:background="@drawable/bg_circle_success"
+                            android:padding="@dimen/padding_small" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Nuevos"
+                            android:textSize="@dimen/text_small"
+                            android:layout_marginTop="@dimen/margin_small" />
+
+                    </LinearLayout>
+
+                    <!-- Favoritos -->
+                    <LinearLayout
+                        android:id="@+id/btnFavoritos"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="?selectableItemBackground"
+                        android:padding="@dimen/padding_small">
+
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:src="@drawable/ic_favorito"
+                            android:background="@drawable/bg_circle_warning"
+                            android:padding="@dimen/padding_small" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Favoritos"
+                            android:textSize="@dimen/text_small"
+                            android:layout_marginTop="@dimen/margin_small" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Sección Categorías -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="@dimen/margin_large">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Categorías"
+                    android:textSize="@dimen/text_large"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="@dimen/margin_medium" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCategorias"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            </LinearLayout>
+
+            <!-- Sección Productos Destacados -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="@dimen/margin_large">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Destacados"
+                    android:textSize="@dimen/text_large"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="@dimen/margin_medium" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvDestacados"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="2" />
+
+            </LinearLayout>
+
+            <!-- Sección Más Vendidos -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="@dimen/margin_large">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Más Vendidos"
+                    android:textSize="@dimen/text_large"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="@dimen/margin_medium" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvMasVendidos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Floating Action Button para carrito -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabCart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/margin_large"
+        android:src="@drawable/ic_cart_light"
+        app:fabSize="normal"
+        app:backgroundTint="@color/primary"
+        app:tint="@color/onPrimary" />
+
+    <!-- Badge para el carrito -->
+    <TextView
+        android:id="@+id/tvCartBadge"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/margin_large"
+        android:layout_marginBottom="80dp"
+        android:background="@drawable/bg_badge"
+        android:gravity="center"
+        android:text="0"
+        android:textColor="@color/onPrimary"
+        android:textSize="10sp"
+        android:visibility="gone" />
+
+</LinearLayout> 

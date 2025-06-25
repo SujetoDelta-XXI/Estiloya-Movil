@@ -53,10 +53,10 @@ class DetalleProductoActivity : BaseActivity() {
         binding.textId.text = producto.id.toString()
 
         // Configurar precios y descuento
-        if (producto.descuento > 0) {
+        if (producto.descuentoPorcentajeCalculado > 0) {
             // Mostrar descuento
             binding.textDescuento.visibility = android.view.View.VISIBLE
-            binding.textDescuento.text = "-${producto.descuento}%"
+            binding.textDescuento.text = "-${producto.descuentoPorcentajeCalculado}%"
             
             // Mostrar precio original tachado
             binding.textPrecioOriginal.visibility = android.view.View.VISIBLE
@@ -65,7 +65,7 @@ class DetalleProductoActivity : BaseActivity() {
                 binding.textPrecioOriginal.paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
             
             // Calcular y mostrar precio con descuento
-            val precioConDescuento = producto.precio * (1 - producto.descuento / 100.0)
+            val precioConDescuento = producto.precioConDescuento
             binding.textPrecio.text = "S/ ${String.format("%.2f", precioConDescuento)}"
         } else {
             // Sin descuento
