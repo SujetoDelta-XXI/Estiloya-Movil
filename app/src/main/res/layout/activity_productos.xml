@@ -18,14 +18,72 @@
         android:gravity="center"
         android:layout_marginBottom="@dimen/margin_medium"/>
 
-    <!-- Filtros -->
+    <!-- Buscador -->
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_search_input"
+        android:padding="@dimen/padding_small"
+        android:layout_marginBottom="@dimen/margin_medium">
+
+        <EditText
+            android:id="@+id/etBuscarProducto"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:hint="Buscar productos por nombre..."
+            android:background="@null"
+            android:paddingStart="@dimen/padding_medium"
+            android:paddingEnd="@dimen/padding_medium"
+            android:textSize="@dimen/text_small"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:maxLines="1"
+            android:singleLine="true" />
+
+        <ImageButton
+            android:id="@+id/btnBuscarProducto"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_search"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="Buscar"
+            android:tint="@color/primary" />
+
+    </LinearLayout>
+
+    <!-- Botón para abrir filtros -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="@dimen/margin_medium">
+
+        <Button
+            android:id="@+id/btnMostrarFiltros"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/button_height"
+            android:layout_weight="1"
+            android:text="@string/filter_show"
+            android:textSize="@dimen/text_medium"
+            android:backgroundTint="@color/primary"
+            android:textColor="@color/onPrimary"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="@dimen/padding_small" />
+
+    </LinearLayout>
+
+    <!-- Panel de filtros (inicialmente oculto) -->
+    <LinearLayout
+        android:id="@+id/panelFiltros"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@drawable/bg_filter_container"
         android:padding="@dimen/padding_medium"
-        android:layout_marginBottom="@dimen/margin_medium">
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:visibility="gone">
 
         <!-- Rango de precio -->
         <TextView
@@ -133,15 +191,90 @@
 
         </LinearLayout>
 
-        <!-- Botón aplicar filtros -->
-        <Button
-            android:id="@+id/btnAplicarFiltros"
+        <!-- Filtros de botones circulares -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/button_height"
-            android:text="@string/filter_apply"
-            android:textSize="@dimen/text_medium"
-            android:backgroundTint="@color/primary"
-            android:textColor="@color/onPrimary"/>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="@dimen/margin_medium">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_rapid_filters"
+                style="@style/FilterTitle"/>
+
+            <GridLayout
+                android:id="@+id/layoutFiltrosRapidos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2"
+                android:rowCount="2"
+                android:useDefaultMargins="true"
+                android:layout_marginTop="@dimen/margin_small">
+
+                <CheckBox
+                    android:id="@+id/checkMenos50"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="@string/filter_less_than_50"/>
+
+                <CheckBox
+                    android:id="@+id/checkPocasUnidades"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="@string/filter_last_units"/>
+
+                <CheckBox
+                    android:id="@+id/checkOferta"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="@string/filter_offer"/>
+
+                <CheckBox
+                    android:id="@+id/checkNuevos"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="@string/filter_new"/>
+
+            </GridLayout>
+
+        </LinearLayout>
+
+        <!-- Botones de acción -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/margin_medium">
+
+            <Button
+                android:id="@+id/btnAplicarFiltros"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:text="@string/filter_apply"
+                android:textSize="@dimen/text_medium"
+                android:backgroundTint="@color/primary"
+                android:textColor="@color/onPrimary"
+                android:layout_marginEnd="@dimen/margin_small" />
+
+            <Button
+                android:id="@+id/btnLimpiarFiltros"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:text="@string/filter_clear"
+                android:textSize="@dimen/text_medium"
+                android:backgroundTint="@color/surface"
+                android:textColor="@color/text"
+                android:layout_marginStart="@dimen/margin_small" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

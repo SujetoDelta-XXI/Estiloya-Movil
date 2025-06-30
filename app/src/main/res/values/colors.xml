@@ -23,10 +23,13 @@
     <!-- Colores adicionales para el nuevo layout -->
     <color name="surface">#FFFFFF</color>
     <color name="outline">#E0E0E0</color>
-    <color name="accent">#FF5722</color>
+    <color name="accent">#666666</color>
     <color name="success">#4CAF50</color>
     <color name="warning">#FF9800</color>
     <color name="error">#F44336</color>
+
+    <color name="menos_50_icon">#FFFFFF</color>
+    <color name="notificacion_icon">#000000</color>
 
 </resources>
 

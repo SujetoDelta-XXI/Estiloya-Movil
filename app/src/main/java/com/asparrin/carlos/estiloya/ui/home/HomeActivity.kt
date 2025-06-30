@@ -5,27 +5,56 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.asparrin.carlos.estiloya.R
+import com.asparrin.carlos.estiloya.api.ApiClient
+import com.asparrin.carlos.estiloya.api.CategoriaService
+import com.asparrin.carlos.estiloya.data.model.Categoria
 import com.asparrin.carlos.estiloya.databinding.ActivityHomeBinding
 import com.asparrin.carlos.estiloya.ui.base.BaseActivity
-import com.asparrin.carlos.estiloya.ui.components.Banner
 import com.asparrin.carlos.estiloya.ui.components.BannersAdapter
-import com.asparrin.carlos.estiloya.ui.components.Categoria
 import com.asparrin.carlos.estiloya.ui.components.CategoriasAdapter
+import com.asparrin.carlos.estiloya.ui.components.ProductAdapter
+import com.asparrin.carlos.estiloya.ui.productos.DetalleProductoActivity
 import com.asparrin.carlos.estiloya.ui.productos.ProductosActivity
-import com.asparrin.carlos.estiloya.ui.productos.ProductosAdapter
+import com.asparrin.carlos.estiloya.viewModel.HomeViewModel
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+// Clases de datos para el Home
+data class Banner(
+    val id: Int,
+    val imagen: Int,
+    val titulo: String,
+    val descripcion: String
+)
 
 class HomeActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var bannersAdapter: BannersAdapter
     private lateinit var categoriasAdapter: CategoriasAdapter
-    private lateinit var destacadosAdapter: ProductosAdapter
-    private lateinit var masVendidosAdapter: ProductosAdapter
+    
+    // Adaptadores para las diferentes secciones de productos
+    private lateinit var ofertasDelDiaAdapter: ProductAdapter
+    private lateinit var ofertasDeLaSemanaAdapter: ProductAdapter
+    private lateinit var masVendidosAdapter: ProductAdapter
+    private lateinit var nuevosProductosAdapter: ProductAdapter
+    private lateinit var productosFiltradosAdapter: ProductAdapter
+    
+    // ViewModel
+    private val homeViewModel: HomeViewModel by lazy {
+        androidx.lifecycle.ViewModelProvider(this)[HomeViewModel::class.java]
+    }
+
+    // Servicio de categorías
+    private val categoriaService: CategoriaService by lazy {
+        ApiClient.retrofit.create(CategoriaService::class.java)
+    }
 
     override fun getLayoutResourceId(): Int = R.layout.activity_home
 
@@ -37,104 +66,41 @@ class HomeActivity : BaseActivity() {
         val child = contentFrame.getChildAt(0)
         binding = ActivityHomeBinding.bind(child)
 
-        setupToolbar()
-        setupSearchView()
         setupBanners()
-        setupQuickActions()
         setupCategorias()
-        setupProductosDestacados()
-        setupMasVendidos()
-        setupFloatingActionButton()
-    }
-
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayShowTitleEnabled(false)
-    }
-
-    private fun setupSearchView() {
-        // Mostrar/ocultar barra de búsqueda
-        binding.btnSearch.setOnClickListener {
-            if (binding.searchContainer.visibility == View.VISIBLE) {
-                binding.searchContainer.visibility = View.GONE
-            } else {
-                binding.searchContainer.visibility = View.VISIBLE
-                binding.etSearch.requestFocus()
-            }
-        }
-
-        // Acción de búsqueda
-        binding.btnSearchAction.setOnClickListener {
-            val query = binding.etSearch.text.toString()
-            if (query.isNotEmpty()) {
-                // Aquí implementarías la búsqueda
-                Toast.makeText(this, "Buscando: $query", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        // Abrir menú de usuario
-        binding.btnProfile.setOnClickListener {
-            // Aquí implementarías la apertura del menú de usuario
-            Toast.makeText(this, "Menú de usuario", Toast.LENGTH_SHORT).show()
-        }
+        setupProductAdapters()
+        setupClickListeners()
+        setupObservers()
+        
+        // Cargar datos
+        homeViewModel.cargarTodosLosDatos()
+        cargarCategorias()
     }
 
     private fun setupBanners() {
         val banners = listOf(
-            Banner(1, R.drawable.imagen_background, "Oferta Especial", "Hasta 50% de descuento"),
+            Banner(1, R.drawable.imagen_background, "Ofertas Especiales", "Descuentos hasta 50%"),
             Banner(2, R.drawable.imagen_background, "Nuevos Productos", "Descubre las últimas tendencias"),
-            Banner(3, R.drawable.imagen_background, "Envío Gratis", "En compras superiores a $50")
+            Banner(3, R.drawable.imagen_background, "Envío Gratis", "En compras superiores a S/ 100")
         )
 
         bannersAdapter = BannersAdapter(banners) { banner ->
-            Toast.makeText(this, "Banner: ${banner.titulo}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Banner clickeado: ${banner.titulo}", Toast.LENGTH_SHORT).show()
         }
 
-        binding.viewPagerBanners.adapter = bannersAdapter
-
-        // Configurar indicador de páginas
-        TabLayoutMediator(binding.tabLayoutBanners, binding.viewPagerBanners) { _, _ ->
-            // No necesitamos hacer nada aquí
-        }.attach()
-
-        // Auto-scroll de banners
-        binding.viewPagerBanners.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                // Aquí podrías implementar lógica adicional
-            }
-        })
-    }
-
-    private fun setupQuickActions() {
-        binding.btnCategorias.setOnClickListener {
-            startActivity(Intent(this, ProductosActivity::class.java))
-        }
-
-        binding.btnOfertas.setOnClickListener {
-            Toast.makeText(this, "Ver ofertas", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.btnNuevos.setOnClickListener {
-            Toast.makeText(this, "Ver nuevos productos", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.btnFavoritos.setOnClickListener {
-            Toast.makeText(this, "Ver favoritos", Toast.LENGTH_SHORT).show()
+        binding.viewPagerBanners.apply {
+            adapter = bannersAdapter
+            orientation = ViewPager2.ORIENTATION_HORIZONTAL
         }
     }
 
     private fun setupCategorias() {
-        val categorias = listOf(
-            Categoria(1, "Ropa", R.drawable.ic_categoria, R.drawable.bg_circle_primary),
-            Categoria(2, "Zapatos", R.drawable.ic_categoria, R.drawable.bg_circle_accent),
-            Categoria(3, "Accesorios", R.drawable.ic_categoria, R.drawable.bg_circle_success),
-            Categoria(4, "Bolsos", R.drawable.ic_categoria, R.drawable.bg_circle_warning),
-            Categoria(5, "Joyas", R.drawable.ic_categoria, R.drawable.bg_circle_primary)
-        )
-
-        categoriasAdapter = CategoriasAdapter(categorias) { categoria ->
-            Toast.makeText(this, "Categoría: ${categoria.nombre}", Toast.LENGTH_SHORT).show()
+        // Configurar el adaptador de categorías
+        categoriasAdapter = CategoriasAdapter(emptyList()) { categoria ->
+            // Navegar a productos con filtro de categoría
+            val intent = Intent(this, ProductosActivity::class.java)
+            intent.putExtra("categoria", categoria.nombre)
+            startActivity(intent)
         }
 
         binding.rvCategorias.apply {
@@ -143,47 +109,97 @@ class HomeActivity : BaseActivity() {
         }
     }
 
-    private fun setupProductosDestacados() {
-        // Usar el mismo adaptador de productos pero con layout de grid
-        destacadosAdapter = ProductosAdapter(
+    private fun cargarCategorias() {
+        binding.progressCategorias.visibility = View.VISIBLE
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = categoriaService.getCategorias()
+                
+                withContext(Dispatchers.Main) {
+                    binding.progressCategorias.visibility = View.GONE
+                    
+                    if (response.isSuccessful) {
+                        val categorias = response.body() ?: emptyList()
+                        categoriasAdapter.updateData(categorias)
+                    } else {
+                        // Fallback a categorías mock
+                        val categoriasMock = listOf(
+                            Categoria(1, "Anime"),
+                            Categoria(2, "Comics"),
+                            Categoria(3, "Películas"),
+                            Categoria(4, "Series"),
+                            Categoria(5, "Videojuegos")
+                        )
+                        categoriasAdapter.updateData(categoriasMock)
+                        Toast.makeText(this@HomeActivity, getString(R.string.error_loading_categories), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    binding.progressCategorias.visibility = View.GONE
+                    // Fallback a categorías mock
+                    val categoriasMock = listOf(
+                        Categoria(1, "Anime"),
+                        Categoria(2, "Comics"),
+                        Categoria(3, "Películas"),
+                        Categoria(4, "Series"),
+                        Categoria(5, "Videojuegos")
+                    )
+                    categoriasAdapter.updateData(categoriasMock)
+                    Toast.makeText(this@HomeActivity, getString(R.string.network_error_categories), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun setupProductAdapters() {
+        // Configurar adaptador para Ofertas del Día
+        ofertasDelDiaAdapter = ProductAdapter(
             productos = emptyList(),
             onProductoClick = { producto ->
-                // Navegar al detalle del producto
-                val intent = Intent(this, com.asparrin.carlos.estiloya.ui.productos.DetalleProductoActivity::class.java)
+                val intent = Intent(this, DetalleProductoActivity::class.java)
                 intent.putExtra("producto", producto)
                 startActivity(intent)
             },
             onAgregarClick = { producto ->
                 Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
-            },
-            onComprarClick = { producto ->
-                Toast.makeText(this, "Comprar: ${producto.nombre}", Toast.LENGTH_SHORT).show()
             }
         )
 
-        binding.rvDestacados.apply {
-            layoutManager = GridLayoutManager(this@HomeActivity, 2)
-            adapter = destacadosAdapter
+        binding.rvOfertasDelDia.apply {
+            layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
+            adapter = ofertasDelDiaAdapter
         }
 
-        // Aquí cargarías los productos destacados desde la API
-        loadProductosDestacados()
-    }
-
-    private fun setupMasVendidos() {
-        masVendidosAdapter = ProductosAdapter(
+        // Configurar adaptador para Ofertas de la Semana
+        ofertasDeLaSemanaAdapter = ProductAdapter(
             productos = emptyList(),
             onProductoClick = { producto ->
-                // Navegar al detalle del producto
-                val intent = Intent(this, com.asparrin.carlos.estiloya.ui.productos.DetalleProductoActivity::class.java)
+                val intent = Intent(this, DetalleProductoActivity::class.java)
                 intent.putExtra("producto", producto)
                 startActivity(intent)
             },
             onAgregarClick = { producto ->
                 Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
+            }
+        )
+
+        binding.rvOfertasDeLaSemana.apply {
+            layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
+            adapter = ofertasDeLaSemanaAdapter
+        }
+
+        // Configurar adaptador para Más Vendidos
+        masVendidosAdapter = ProductAdapter(
+            productos = emptyList(),
+            onProductoClick = { producto ->
+                val intent = Intent(this, DetalleProductoActivity::class.java)
+                intent.putExtra("producto", producto)
+                startActivity(intent)
             },
-            onComprarClick = { producto ->
-                Toast.makeText(this, "Comprar: ${producto.nombre}", Toast.LENGTH_SHORT).show()
+            onAgregarClick = { producto ->
+                Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
             }
         )
 
@@ -192,43 +208,155 @@ class HomeActivity : BaseActivity() {
             adapter = masVendidosAdapter
         }
 
-        // Aquí cargarías los productos más vendidos desde la API
-        loadMasVendidos()
-    }
+        // Configurar adaptador para Nuevos Productos
+        nuevosProductosAdapter = ProductAdapter(
+            productos = emptyList(),
+            onProductoClick = { producto ->
+                val intent = Intent(this, DetalleProductoActivity::class.java)
+                intent.putExtra("producto", producto)
+                startActivity(intent)
+            },
+            onAgregarClick = { producto ->
+                Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
+            }
+        )
 
-    private fun setupFloatingActionButton() {
-        binding.fabCart.setOnClickListener {
-            Toast.makeText(this, "Ver carrito", Toast.LENGTH_SHORT).show()
+        binding.rvNuevosProductos.apply {
+            layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
+            adapter = nuevosProductosAdapter
         }
 
-        // Actualizar badge del carrito
-        updateCartBadge(3) // Ejemplo con 3 items
-    }
-
-    private fun loadProductosDestacados() {
-        // Aquí implementarías la carga de productos destacados desde la API
-        // Por ahora usamos datos de ejemplo
-        val productosDestacados = listOf<com.asparrin.carlos.estiloya.data.model.Producto>(
-            // Usar productos de ejemplo o cargar desde la API
+        // Configurar adaptador para Productos Filtrados
+        productosFiltradosAdapter = ProductAdapter(
+            productos = emptyList(),
+            onProductoClick = { producto ->
+                val intent = Intent(this, DetalleProductoActivity::class.java)
+                intent.putExtra("producto", producto)
+                startActivity(intent)
+            },
+            onAgregarClick = { producto ->
+                Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
+            }
         )
-        // destacadosAdapter.updateData(productosDestacados)
     }
 
-    private fun loadMasVendidos() {
-        // Aquí implementarías la carga de productos más vendidos desde la API
-        // Por ahora usamos datos de ejemplo
-        val masVendidos = listOf<com.asparrin.carlos.estiloya.data.model.Producto>(
-            // Usar productos de ejemplo o cargar desde la API
-        )
-        // masVendidosAdapter.updateData(masVendidos)
+    private fun setupClickListeners() {
+        // Menos de 50
+        binding.btnMenosDe50.setOnClickListener {
+            val intent = Intent(this, ProductosActivity::class.java)
+            intent.putExtra("menosDe50", true)
+            startActivity(intent)
+        }
+        // Pocas Unidades
+        binding.btnPocasUnidades.setOnClickListener {
+            val intent = Intent(this, ProductosActivity::class.java)
+            intent.putExtra("pocasUnidades", true)
+            startActivity(intent)
+        }
+        // Oferta
+        binding.btnOfertas.setOnClickListener {
+            val intent = Intent(this, ProductosActivity::class.java)
+            intent.putExtra("mostrarOfertas", true)
+            startActivity(intent)
+        }
+        // Nuevos
+        binding.btnNuevos.setOnClickListener {
+            val intent = Intent(this, ProductosActivity::class.java)
+            intent.putExtra("mostrarNuevos", true)
+            startActivity(intent)
+        }
     }
 
-    private fun updateCartBadge(count: Int) {
-        if (count > 0) {
-            binding.tvCartBadge.text = count.toString()
-            binding.tvCartBadge.visibility = View.VISIBLE
-        } else {
-            binding.tvCartBadge.visibility = View.GONE
+    private fun setupObservers() {
+        // Observar ofertas del día
+        homeViewModel.ofertasDelDia.observe(this) { productos ->
+            ofertasDelDiaAdapter.updateData(productos)
+        }
+
+        homeViewModel.isLoadingOfertasDia.observe(this) { isLoading ->
+            binding.progressOfertasDelDia.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        homeViewModel.errorOfertasDia.observe(this) { error ->
+            error?.let {
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            }
+        }
+
+        // Observar ofertas de la semana
+        homeViewModel.ofertasDeLaSemana.observe(this) { productos ->
+            ofertasDeLaSemanaAdapter.updateData(productos)
+        }
+
+        homeViewModel.isLoadingOfertasSemana.observe(this) { isLoading ->
+            binding.progressOfertasDeLaSemana.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        homeViewModel.errorOfertasSemana.observe(this) { error ->
+            error?.let {
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            }
+        }
+
+        // Observar productos más vendidos
+        homeViewModel.productosMasVendidos.observe(this) { productos ->
+            masVendidosAdapter.updateData(productos)
+        }
+
+        homeViewModel.isLoadingMasVendidos.observe(this) { isLoading ->
+            binding.progressMasVendidos.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        homeViewModel.errorMasVendidos.observe(this) { error ->
+            error?.let {
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            }
+        }
+
+        // Observar nuevos productos
+        homeViewModel.nuevosProductos.observe(this) { productos ->
+            nuevosProductosAdapter.updateData(productos)
+        }
+
+        homeViewModel.isLoadingNuevos.observe(this) { isLoading ->
+            binding.progressNuevosProductos.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        homeViewModel.errorNuevos.observe(this) { error ->
+            error?.let {
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun mostrarProductosFiltrados(productos: List<com.asparrin.carlos.estiloya.data.model.Producto>) {
+        // Actualizar el adaptador con los productos filtrados
+        productosFiltradosAdapter.updateData(productos)
+
+        // Actualizar el título según los filtros activos
+        val titulo = when {
+            homeViewModel.filtroDescuentoActivo.value == true && homeViewModel.filtroNuevoActivo.value == true ->
+                getString(R.string.filtered_products_discount_and_new)
+            homeViewModel.filtroDescuentoActivo.value == true ->
+                getString(R.string.filtered_products_with_discount)
+            homeViewModel.filtroNuevoActivo.value == true ->
+                getString(R.string.filtered_products_new)
+            else -> getString(R.string.filtered_products)
+        }
+
+        // Mostrar mensaje informativo
+        val mensaje = when {
+            homeViewModel.filtroDescuentoActivo.value == true && homeViewModel.filtroNuevoActivo.value == true ->
+                getString(R.string.showing_discount_and_new_products)
+            homeViewModel.filtroDescuentoActivo.value == true ->
+                getString(R.string.showing_discount_products)
+            homeViewModel.filtroNuevoActivo.value == true ->
+                getString(R.string.showing_new_products)
+            else -> ""
+        }
+        
+        if (mensaje.isNotEmpty()) {
+            Toast.makeText(this, "$mensaje (${productos.size} productos)", Toast.LENGTH_SHORT).show()
         }
     }
 }

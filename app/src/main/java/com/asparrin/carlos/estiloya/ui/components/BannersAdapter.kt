@@ -4,15 +4,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.asparrin.carlos.estiloya.R
-
-data class Banner(
-    val id: Int,
-    val imagen: Int,
-    val titulo: String,
-    val descripcion: String
-)
+import com.asparrin.carlos.estiloya.ui.home.Banner
 
 class BannersAdapter(
     private val banners: List<Banner>,
@@ -20,7 +15,9 @@ class BannersAdapter(
 ) : RecyclerView.Adapter<BannersAdapter.BannerViewHolder>() {
 
     class BannerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val ivBanner: ImageView = itemView.findViewById(R.id.ivBanner)
+        val imageView: ImageView = itemView.findViewById(R.id.ivBanner)
+        val tvTitulo: TextView = itemView.findViewById(R.id.tvTitulo)
+        val tvDescripcion: TextView = itemView.findViewById(R.id.tvDescripcion)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BannerViewHolder {
@@ -32,7 +29,9 @@ class BannersAdapter(
     override fun onBindViewHolder(holder: BannerViewHolder, position: Int) {
         val banner = banners[position]
         
-        holder.ivBanner.setImageResource(banner.imagen)
+        holder.imageView.setImageResource(banner.imagen)
+        holder.tvTitulo.text = banner.titulo
+        holder.tvDescripcion.text = banner.descripcion
         
         holder.itemView.setOnClickListener {
             onBannerClick(banner)

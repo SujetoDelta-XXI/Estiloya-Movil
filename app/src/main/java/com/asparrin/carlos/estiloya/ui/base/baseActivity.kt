@@ -39,7 +39,6 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         session = sess
         setContentViewWithBase(getLayoutResourceId())
-        setupNavigation()  // conserva si quieres la lógica de finish() en nav
     }
 
     abstract fun getLayoutResourceId(): Int
@@ -73,15 +72,6 @@ abstract class BaseActivity : AppCompatActivity() {
                 else R.drawable.ic_user_dark
             )
             setOnClickListener { mostrarPopupUsuario(this) }
-        }
-        hb.iconCart.apply {
-            setImageResource(
-                if (isDark) R.drawable.ic_cart_light
-                else R.drawable.ic_cart_dark
-            )
-            setOnClickListener {
-                startActivity(Intent(this@BaseActivity, ProductosActivity::class.java))
-            }
         }
     }
 
@@ -187,14 +177,5 @@ abstract class BaseActivity : AppCompatActivity() {
             popupWindow.dismiss()
             this.recreate()
         }
-    }
-
-    private fun setupNavigation() {
-        // He eliminado el listener de iconUser aquí para no sobrescribir el de setupHeader().
-        findViewById<View>(R.id.iconCart)?.setOnClickListener {
-            startActivity(Intent(this, ProductosActivity::class.java))
-        }
-
-        // Navegación del navSection ya está en setupNav()
     }
 }

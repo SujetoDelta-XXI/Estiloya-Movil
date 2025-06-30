@@ -2,8 +2,9 @@
 <resources>
     <color name="background">#201F1F</color>        <!-- Fondo negro -->
     <color name="text">#FFFFFF</color>              <!-- Texto blanco -->
-    <color name="primary">#FFFFFF</color>           <!-- Botones claros -->
-    <color name="onPrimary">#000000</color>         <!-- Texto negro sobre botones claros -->
+    <color name="primary">#FFFFFF</color>           <!-- Botones blancos -->
+    <color name="onPrimary">#000000</color>         <!-- Texto negro sobre botones blancos -->
+    <color name="surface">#2C2C2C</color>           <!-- Fondo gris para tarjetas -->
     
     <!-- Colores para filtros en modo oscuro -->
     <color name="filter_background">#2C2C2C</color>
@@ -11,4 +12,6 @@
     <color name="filter_hint">#B0B0B0</color>
     <color name="filter_border">#404040</color>
     <color name="filter_input_background">#3A3A3A</color>
+    <color name="menos_50_icon">#000000</color>
+    <color name="notificacion_icon">#FFFFFF</color>
 </resources>

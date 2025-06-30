@@ -7,22 +7,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.asparrin.carlos.estiloya.R
-
-data class Categoria(
-    val id: Int,
-    val nombre: String,
-    val icono: Int,
-    val color: Int
-)
+import com.asparrin.carlos.estiloya.data.model.Categoria
 
 class CategoriasAdapter(
-    private val categorias: List<Categoria>,
+    private var categorias: List<Categoria>,
     private val onCategoriaClick: (Categoria) -> Unit
 ) : RecyclerView.Adapter<CategoriasAdapter.CategoriaViewHolder>() {
 
     class CategoriaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val ivIcono: ImageView = itemView.findViewById(R.id.ivCategoriaIcono)
-        val tvNombre: TextView = itemView.findViewById(R.id.tvCategoriaNombre)
+        val ivIcono: ImageView = itemView.findViewById(R.id.ivIcono)
+        val tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoriaViewHolder {
@@ -34,8 +28,18 @@ class CategoriasAdapter(
     override fun onBindViewHolder(holder: CategoriaViewHolder, position: Int) {
         val categoria = categorias[position]
         
-        holder.ivIcono.setImageResource(categoria.icono)
-        holder.ivIcono.setBackgroundResource(categoria.color)
+        // Usar icono por defecto y background basado en el ID
+        val iconoRes = R.drawable.ic_categoria
+        val backgroundRes = when (categoria.id % 5) {
+            0L -> R.drawable.bg_circle_primary
+            1L -> R.drawable.bg_circle_accent
+            2L -> R.drawable.bg_circle_success
+            3L -> R.drawable.bg_circle_warning
+            else -> R.drawable.bg_circle_primary
+        }
+        
+        holder.ivIcono.setImageResource(iconoRes)
+        holder.ivIcono.setBackgroundResource(backgroundRes)
         holder.tvNombre.text = categoria.nombre
         
         holder.itemView.setOnClickListener {
@@ -44,4 +48,9 @@ class CategoriasAdapter(
     }
 
     override fun getItemCount(): Int = categorias.size
+
+    fun updateData(nuevasCategorias: List<Categoria>) {
+        categorias = nuevasCategorias
+        notifyDataSetChanged()
+    }
 } 

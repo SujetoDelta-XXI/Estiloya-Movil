@@ -19,17 +19,16 @@
         android:textColor="@color/text"
         android:layout_marginEnd="@dimen/margin_large"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/iconCart"
+        app:layout_constraintEnd_toStartOf="@id/iconNotificacion"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- Ícono del carrito -->
+    <!-- Ícono de notificación -->
     <ImageView
-        android:id="@+id/iconCart"
+        android:id="@+id/iconNotificacion"
         android:layout_width="@dimen/icon_large"
         android:layout_height="@dimen/icon_large"
-        android:src="@drawable/ic_cart_dark"
-        android:contentDescription="Carrito"
+        android:contentDescription="Notificaciones"
         android:layout_marginEnd="@dimen/margin_medium"
         android:clickable="true"
         android:focusable="true"

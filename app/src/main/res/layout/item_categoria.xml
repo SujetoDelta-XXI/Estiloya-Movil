@@ -5,23 +5,25 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="?selectableItemBackground"
     android:padding="@dimen/padding_medium"
-    android:layout_margin="@dimen/margin_small">
+    android:background="?selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <ImageView
-        android:id="@+id/ivCategoriaIcono"
+        android:id="@+id/ivIcono"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:padding="@dimen/padding_small"
-        android:background="@drawable/bg_circle_primary" />
+        android:contentDescription="Icono de categoría" />
 
     <TextView
-        android:id="@+id/tvCategoriaNombre"
+        android:id="@+id/tvNombre"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Categoría"
         android:textSize="@dimen/text_small"
+        android:textColor="@color/text"
         android:layout_marginTop="@dimen/margin_small"
         android:gravity="center" />
 

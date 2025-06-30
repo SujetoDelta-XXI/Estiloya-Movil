@@ -1,349 +1,371 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- AppBar con Toolbar -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-
-        <!-- Logo/Nombre de la app -->
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="EstiloYa"
-            android:textColor="@color/onPrimary"
-            android:textSize="@dimen/text_large"
-            android:textStyle="bold"
-            android:gravity="start|center_vertical" />
-
-        <!-- Ícono de búsqueda -->
-        <ImageButton
-            android:id="@+id/btnSearch"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_search"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="Buscar"
-            android:tint="@color/onPrimary" />
-
-        <!-- Ícono de perfil/notificaciones -->
-        <ImageButton
-            android:id="@+id/btnProfile"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_user_light"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="Perfil"
-            android:tint="@color/onPrimary" />
-
-    </androidx.appcompat.widget.Toolbar>
-
-    <!-- Barra de búsqueda fija -->
-    <LinearLayout
-        android:id="@+id/searchContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/surface"
-        android:padding="@dimen/padding_small"
-        android:visibility="gone">
-
-        <EditText
-            android:id="@+id/etSearch"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:hint="¿Qué buscas hoy?"
-            android:background="@drawable/bg_search_input"
-            android:paddingStart="@dimen/padding_medium"
-            android:paddingEnd="@dimen/padding_medium"
-            android:textSize="@dimen/text_small"
-            android:inputType="text"
-            android:imeOptions="actionSearch" />
-
-        <ImageButton
-            android:id="@+id/btnSearchAction"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_search"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="Buscar"
-            android:layout_marginStart="@dimen/margin_small" />
-
-    </LinearLayout>
-
     <!-- Contenido principal -->
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/container_principal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <!-- Contenido principal -->
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/padding_medium">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-            <!-- Slider de banners (ViewPager2) -->
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewPagerBanners"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginBottom="@dimen/margin_medium" />
-
-            <!-- Indicador de páginas para el ViewPager -->
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabLayoutBanners"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:tabBackground="@drawable/tab_selector"
-                app:tabGravity="center"
-                app:tabIndicatorHeight="0dp"
-                android:layout_marginBottom="@dimen/margin_large" />
-
-            <!-- Accesos rápidos (Quick Actions) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginBottom="@dimen/margin_large">
+                android:padding="@dimen/padding_medium">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Accesos Rápidos"
-                    android:textSize="@dimen/text_large"
-                    android:textStyle="bold"
+                <!-- Slider de banners (ViewPager2) -->
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/viewPagerBanners"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
                     android:layout_marginBottom="@dimen/margin_medium" />
 
+
+                <!-- Accesos rápidos (Quick Actions) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/margin_large">
 
-                    <!-- Categorías -->
-                    <LinearLayout
-                        android:id="@+id/btnCategorias"
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="?selectableItemBackground"
-                        android:padding="@dimen/padding_small">
+                        android:text="@string/quick_access"
+                        android:textSize="@dimen/text_large"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/margin_medium" />
 
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_categoria"
-                            android:background="@drawable/bg_circle_primary"
-                            android:padding="@dimen/padding_small" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Categorías"
-                            android:textSize="@dimen/text_small"
-                            android:layout_marginTop="@dimen/margin_small" />
-
-                    </LinearLayout>
-
-                    <!-- Ofertas -->
                     <LinearLayout
-                        android:id="@+id/btnOfertas"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="?selectableItemBackground"
-                        android:padding="@dimen/padding_small">
+                        android:orientation="horizontal"
+                        android:gravity="center">
 
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_oferta"
-                            android:background="@drawable/bg_circle_accent"
-                            android:padding="@dimen/padding_small" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- Menos de 50 soles -->
+                        <LinearLayout
+                            android:id="@+id/btnMenosDe50"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Ofertas"
-                            android:textSize="@dimen/text_small"
-                            android:layout_marginTop="@dimen/margin_small" />
+                            android:layout_weight="1"
+                            android:background="@color/background"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="@dimen/padding_small">
 
-                    </LinearLayout>
+                            <ImageView
+                                android:id="@+id/iconMenos50"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_circle_accent"
+                                android:padding="@dimen/padding_small"
+                                android:src="@drawable/ic_menos_50_light" />
 
-                    <!-- Nuevos productos -->
-                    <LinearLayout
-                        android:id="@+id/btnNuevos"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="?selectableItemBackground"
-                        android:padding="@dimen/padding_small">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:text="@string/filter_less_than_50"
+                                android:textColor="@color/text"
+                                android:textSize="@dimen/text_small" />
 
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_nuevo"
-                            android:background="@drawable/bg_circle_success"
-                            android:padding="@dimen/padding_small" />
+                        </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- Pocas Unidades -->
+                        <LinearLayout
+                            android:id="@+id/btnPocasUnidades"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Nuevos"
-                            android:textSize="@dimen/text_small"
-                            android:layout_marginTop="@dimen/margin_small" />
+                            android:layout_weight="1"
+                            android:background="@color/background"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="@dimen/padding_small">
 
-                    </LinearLayout>
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_circle_warning"
+                                android:padding="@dimen/padding_small"
+                                android:src="@drawable/ic_producto_light" />
 
-                    <!-- Favoritos -->
-                    <LinearLayout
-                        android:id="@+id/btnFavoritos"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:background="?selectableItemBackground"
-                        android:padding="@dimen/padding_small">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:text="@string/filter_last_units"
+                                android:textColor="@color/text"
+                                android:textSize="@dimen/text_small" />
 
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_favorito"
-                            android:background="@drawable/bg_circle_warning"
-                            android:padding="@dimen/padding_small" />
+                        </LinearLayout>
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <!-- Ofertas -->
+                        <LinearLayout
+                            android:id="@+id/btnOfertas"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Favoritos"
-                            android:textSize="@dimen/text_small"
-                            android:layout_marginTop="@dimen/margin_small" />
+                            android:layout_weight="1"
+                            android:background="@color/background"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="@dimen/padding_small">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_circle_accent"
+                                android:padding="@dimen/padding_small"
+                                android:src="@drawable/ic_oferta_light" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:text="@string/filter_offer"
+                                android:textColor="@color/text"
+                                android:textSize="@dimen/text_small" />
+
+                        </LinearLayout>
+
+                        <!-- Nuevos productos -->
+                        <LinearLayout
+                            android:id="@+id/btnNuevos"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="@color/background"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="@dimen/padding_small">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_circle_success"
+                                android:padding="@dimen/padding_small"
+                                android:src="@drawable/ic_nuevo_light" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin_small"
+                                android:text="@string/filter_new"
+                                android:textColor="@color/text"
+                                android:textSize="@dimen/text_small" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
                 </LinearLayout>
 
-            </LinearLayout>
-
-            <!-- Sección Categorías -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="@dimen/margin_large">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Categorías"
-                    android:textSize="@dimen/text_large"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="@dimen/margin_medium" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvCategorias"
+                <!-- Sección Categorías -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/margin_large">
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/categories"
+                        android:textSize="@dimen/text_large"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/margin_medium" />
 
-            <!-- Sección Productos Destacados -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="@dimen/margin_large">
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Destacados"
-                    android:textSize="@dimen/text_large"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="@dimen/margin_medium" />
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvCategorias"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvDestacados"
+                        <ProgressBar
+                            android:id="@+id/progressCategorias"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:visibility="gone" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+                <!-- Sección Ofertas del Día -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                    app:spanCount="2" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/margin_large">
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ofertas del Día"
+                        android:textSize="@dimen/text_large"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/margin_medium" />
 
-            <!-- Sección Más Vendidos -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="@dimen/margin_large">
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Más Vendidos"
-                    android:textSize="@dimen/text_large"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="@dimen/margin_medium" />
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvOfertasDelDia"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvMasVendidos"
+                        <ProgressBar
+                            android:id="@+id/progressOfertasDelDia"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:visibility="gone" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+                <!-- Sección Ofertas de la Semana -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/margin_large">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ofertas de la Semana"
+                        android:textSize="@dimen/text_large"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/margin_medium" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvOfertasDeLaSemana"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                        <ProgressBar
+                            android:id="@+id/progressOfertasDeLaSemana"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:visibility="gone" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+                <!-- Sección Productos Más Vendidos -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/margin_large">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Más Vendidos"
+                        android:textSize="@dimen/text_large"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/margin_medium" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvMasVendidos"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                        <ProgressBar
+                            android:id="@+id/progressMasVendidos"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:visibility="gone" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+                <!-- Sección Nuevos Productos -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/margin_large">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nuevos Productos"
+                        android:textSize="@dimen/text_large"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/margin_medium" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvNuevosProductos"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                        <ProgressBar
+                            android:id="@+id/progressNuevosProductos"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:visibility="gone" />
+
+                    </FrameLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
-        </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 
-    </ScrollView>
-
-    <!-- Floating Action Button para carrito -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabCart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/margin_large"
-        android:src="@drawable/ic_cart_light"
-        app:fabSize="normal"
-        app:backgroundTint="@color/primary"
-        app:tint="@color/onPrimary" />
-
-    <!-- Badge para el carrito -->
-    <TextView
-        android:id="@+id/tvCartBadge"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="@dimen/margin_large"
-        android:layout_marginBottom="80dp"
-        android:background="@drawable/bg_badge"
-        android:gravity="center"
-        android:text="0"
-        android:textColor="@color/onPrimary"
-        android:textSize="10sp"
-        android:visibility="gone" />
-
-</LinearLayout> 
+</FrameLayout> 

@@ -26,10 +26,44 @@
     <string name="filter_price_max_hint">Precio máximo</string>
     <string name="filter_category">Categoría</string>
     <string name="filter_type">Tipo</string>
-    <string name="filter_apply">Aplicar Filtros</string>
+    <string name="filter_apply">Aplicar</string>
     <string name="filter_all_categories">Todas las categorías</string>
     <string name="filter_all_types">Todos los tipos</string>
     <string name="filter_no_results">No se encontraron productos</string>
     <string name="filter_results_found">%d productos encontrados</string>
+
+    <!-- Filtros -->
+    <string name="filtros">Filtros</string>
+    <string name="tiene_descuento">Tiene Descuento</string>
+    <string name="nuevo">Nuevo</string>
+    <string name="productos_filtrados">Productos Filtrados</string>
+    <string name="productos_con_descuento">Productos con Descuento</string>
+    <string name="productos_nuevos">Productos Nuevos</string>
+    <string name="productos_con_descuento_y_nuevos">Productos con Descuento y Nuevos</string>
+
+    <string name="filter_rapid_filters">Filtros Rápidos</string>
+    <string name="filter_less_than_50">Menos de 50</string>
+    <string name="filter_last_units">Por agotarse</string>
+    <string name="filter_offer">Oferta</string>
+    <string name="filter_new">Nuevos</string>
+    <string name="quick_access">Accesos Rápidos</string>
+    <string name="categories">Categorías</string>
+    <string name="filtered_products">Productos Filtrados</string>
+    <string name="filtered_products_with_discount">Productos con Descuento</string>
+    <string name="filtered_products_new">Productos Nuevos</string>
+    <string name="filtered_products_discount_and_new">Productos con Descuento y Nuevos</string>
+    <string name="showing_discount_products">Mostrando productos con descuento</string>
+    <string name="showing_new_products">Mostrando productos nuevos</string>
+    <string name="showing_discount_and_new_products">Mostrando productos con descuento y nuevos</string>
+    <string name="products_count">%d productos</string>
+    <string name="error_loading_categories">Error al cargar categorías, usando datos locales</string>
+    <string name="network_error_categories">Error de red, usando datos locales</string>
+
+    <string name="filter_clear">Limpiar</string>
+    <string name="filter_show">Mostrar Filtros</string>
+    <string name="filter_hide">Ocultar Filtros</string>
+    <string name="filter_cleared">Filtros limpiados</string>
+    <string name="error_loading_categories_products">Error al cargar categorías, usando datos locales</string>
+    <string name="network_error_categories_products">Error de red, usando datos locales</string>
 
 </resources>

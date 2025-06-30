@@ -1,21 +1,19 @@
-package com.asparrin.carlos.estiloya.ui.productos
+package com.asparrin.carlos.estiloya.ui.components
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.asparrin.carlos.estiloya.R
 import com.asparrin.carlos.estiloya.data.model.Producto
 import com.asparrin.carlos.estiloya.databinding.ItemProductoBinding
 import com.bumptech.glide.Glide
 
-class ProductosAdapter(
+class ProductAdapter(
     private var productos: List<Producto>,
     private val onProductoClick: (Producto) -> Unit,
     private val onAgregarClick: (Producto) -> Unit
-) : RecyclerView.Adapter<ProductosAdapter.ProductoViewHolder>() {
+) : RecyclerView.Adapter<ProductAdapter.ProductoViewHolder>() {
 
     class ProductoViewHolder(private val binding: ItemProductoBinding) : RecyclerView.ViewHolder(binding.root) {
         
@@ -78,4 +76,4 @@ class ProductosAdapter(
         productos = nuevosProductos
         notifyDataSetChanged()
     }
-}
+} 

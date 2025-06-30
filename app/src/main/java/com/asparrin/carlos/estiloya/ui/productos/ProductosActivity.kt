@@ -2,6 +2,8 @@ package com.asparrin.carlos.estiloya.ui.productos
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
@@ -9,7 +11,9 @@ import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import com.asparrin.carlos.estiloya.R
 import com.asparrin.carlos.estiloya.api.ApiClient
+import com.asparrin.carlos.estiloya.api.CategoriaService
 import com.asparrin.carlos.estiloya.api.ProductService
+import com.asparrin.carlos.estiloya.data.model.Categoria
 import com.asparrin.carlos.estiloya.data.model.Producto
 import com.asparrin.carlos.estiloya.data.model.PaginatedResponse
 import com.asparrin.carlos.estiloya.databinding.ActivityProductosBinding
@@ -25,6 +29,22 @@ class ProductosActivity : BaseActivity() {
     private lateinit var adapter: ProductosAdapter
     private var productosOriginales: List<Producto> = emptyList()
     private var productosFiltrados: List<Producto> = emptyList()
+    private var productosBuscados: List<Producto> = emptyList()
+    private var categorias: List<Categoria> = emptyList()
+
+    // Estados de filtros rápidos
+    private var filtroMenos50Activo = false
+    private var filtroPocasUnidadesActivo = false
+    private var filtroOfertaActivo = false
+    private var filtroNuevosActivo = false
+    
+    // Variable para marcar si hay filtros pendientes de aplicar
+    private var filtrosPendientes = false
+
+    // Servicios
+    private val categoriaService: CategoriaService by lazy {
+        ApiClient.retrofit.create(CategoriaService::class.java)
+    }
 
     override fun getLayoutResourceId(): Int = R.layout.activity_productos
 
@@ -37,8 +57,48 @@ class ProductosActivity : BaseActivity() {
         binding = ActivityProductosBinding.bind(child)
 
         setupRecyclerView()
-        setupFiltros()
+        setupBuscador()
+        setupFiltrosDesplegables()
+        procesarParametrosEntrada()
+        setupFiltrosRapidos()
+        cargarCategorias()
         fetchProductosFromApi()
+    }
+
+    private fun procesarParametrosEntrada() {
+        intent.extras?.let { extras ->
+            if (extras.getBoolean("mostrarOfertas", false)) {
+                filtroOfertaActivo = true
+                filtrosPendientes = true
+            }
+            if (extras.getBoolean("mostrarNuevos", false)) {
+                filtroNuevosActivo = true
+                filtrosPendientes = true
+            }
+            if (extras.getBoolean("menosDe50", false)) {
+                filtroMenos50Activo = true
+                binding.etPrecioMax.setText("50")
+                filtrosPendientes = true
+            }
+            if (extras.getBoolean("pocasUnidades", false)) {
+                filtroPocasUnidadesActivo = true
+                filtrosPendientes = true
+            }
+            val categoriaNombre = extras.getString("categoria")
+            if (!categoriaNombre.isNullOrEmpty()) {
+                val categoriaIndex =
+                    categorias.indexOfFirst { categoria -> categoria.nombre == categoriaNombre }
+                if (categoriaIndex != -1) {
+                    // Marcar que hay filtro de categoría pendiente
+                    filtrosPendientes = true
+                }
+            }
+        }
+        
+        // Si hay cualquier parámetro de entrada, marcar filtros pendientes
+        if (intent.extras != null && intent.extras!!.size() > 0) {
+            filtrosPendientes = true
+        }
     }
 
     private fun setupRecyclerView() {
@@ -46,7 +106,7 @@ class ProductosActivity : BaseActivity() {
         val layoutManager = GridLayoutManager(this, 2)
         binding.rvProductos.layoutManager = layoutManager
         
-        // Configurar el adaptador
+        // Configurar el adaptador (solo con botón "Agregar al carrito")
         adapter = ProductosAdapter(
             productos = emptyList(),
             onProductoClick = { producto ->
@@ -57,89 +117,255 @@ class ProductosActivity : BaseActivity() {
             },
             onAgregarClick = { producto ->
                 Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
-            },
-            onComprarClick = { producto ->
-                Toast.makeText(this, "Comprando: ${producto.nombre}", Toast.LENGTH_SHORT).show()
             }
         )
         
         binding.rvProductos.adapter = adapter
     }
 
-    private fun setupFiltros() {
-        // Configurar spinner de categorías
-        val categorias = listOf(getString(R.string.filter_all_categories), "Anime", "Comics", "Película", "Serie", "Videojuegos", "Música", "Deporte")
-        val adapterCategoria = ArrayAdapter(this, R.layout.spinner_item_filter, categorias)
-        adapterCategoria.setDropDownViewResource(R.layout.spinner_dropdown_item_filter)
-        binding.spinnerCategoria.adapter = adapterCategoria
+    private fun setupBuscador() {
+        // Configurar búsqueda en tiempo real
+        binding.etBuscarProducto.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                buscarProductos(s.toString())
+            }
+        })
 
-        // Configurar spinner de tipos
+        // Configurar botón de búsqueda
+        binding.btnBuscarProducto.setOnClickListener {
+            val query = binding.etBuscarProducto.text.toString()
+            buscarProductos(query)
+        }
+    }
+
+    private fun buscarProductos(query: String) {
+        if (query.isEmpty()) {
+            // Si no hay búsqueda, mostrar productos filtrados
+            productosBuscados = productosFiltrados
+        } else {
+            // Filtrar por nombre del producto (búsqueda insensible a mayúsculas/minúsculas)
+            productosBuscados = productosFiltrados.filter { producto ->
+                producto.nombre.contains(query, ignoreCase = true)
+            }
+        }
+        
+        actualizarAdapter()
+        
+        // Mostrar mensaje de resultados
+        if (productosBuscados.isEmpty() && query.isNotEmpty()) {
+            Toast.makeText(this, "No se encontraron productos con '$query'", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupFiltrosDesplegables() {
+        // Configurar botón para mostrar/ocultar filtros
+        binding.btnMostrarFiltros.setOnClickListener {
+            togglePanelFiltros()
+        }
+
+        // Configurar spinner de tipos inmediatamente
         val tipos = listOf(getString(R.string.filter_all_types), "Polo", "Polera")
         val adapterTipo = ArrayAdapter(this, R.layout.spinner_item_filter, tipos)
         adapterTipo.setDropDownViewResource(R.layout.spinner_dropdown_item_filter)
         binding.spinnerTipo.adapter = adapterTipo
 
-        // Configurar botón de aplicar filtros
+        // Configurar botón de aplicar filtros - ÚNICO lugar donde se aplican filtros manualmente
         binding.btnAplicarFiltros.setOnClickListener {
             aplicarFiltros()
         }
+
+        // Configurar botón de limpiar filtros
+        binding.btnLimpiarFiltros.setOnClickListener {
+            limpiarFiltros()
+        }
+    }
+
+    private fun togglePanelFiltros() {
+        if (binding.panelFiltros.visibility == View.VISIBLE) {
+            binding.panelFiltros.visibility = View.GONE
+            binding.btnMostrarFiltros.text = getString(R.string.filter_show)
+        } else {
+            binding.panelFiltros.visibility = View.VISIBLE
+            binding.btnMostrarFiltros.text = getString(R.string.filter_hide)
+            
+            // Actualizar estado visual de los CheckBox cuando se muestra el panel
+            binding.checkMenos50.isChecked = filtroMenos50Activo
+            binding.checkPocasUnidades.isChecked = filtroPocasUnidadesActivo
+            binding.checkOferta.isChecked = filtroOfertaActivo
+            binding.checkNuevos.isChecked = filtroNuevosActivo
+        }
+    }
+
+    private fun cargarCategorias() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = categoriaService.getCategorias()
+                
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        categorias = response.body() ?: emptyList()
+                        setupSpinnerCategorias()
+                    } else {
+                        // Fallback a categorías mock
+                        categorias = listOf(
+                            Categoria(1, "Anime"),
+                            Categoria(2, "Comics"),
+                            Categoria(3, "Película"),
+                            Categoria(4, "Serie"),
+                            Categoria(5, "Videojuegos"),
+                            Categoria(6, "Música"),
+                            Categoria(7, "Deporte")
+                        )
+                        setupSpinnerCategorias()
+                        Toast.makeText(this@ProductosActivity, getString(R.string.error_loading_categories_products), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    // Fallback a categorías mock
+                    categorias = listOf(
+                        Categoria(1, "Anime"),
+                        Categoria(2, "Comics"),
+                        Categoria(3, "Película"),
+                        Categoria(4, "Serie"),
+                        Categoria(5, "Videojuegos"),
+                        Categoria(6, "Música"),
+                        Categoria(7, "Deporte")
+                    )
+                    setupSpinnerCategorias()
+                    Toast.makeText(this@ProductosActivity, getString(R.string.network_error_categories_products), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun setupSpinnerCategorias() {
+        val categoriasList = listOf(getString(R.string.filter_all_categories)) + categorias.map { it.nombre }
+        val adapterCategoria = ArrayAdapter(this, R.layout.spinner_item_filter, categoriasList)
+        adapterCategoria.setDropDownViewResource(R.layout.spinner_dropdown_item_filter)
+        binding.spinnerCategoria.adapter = adapterCategoria
+        
+        // Configurar selección de categoría si viene del intent
+        intent.extras?.getString("categoria")?.let { categoriaNombre ->
+            val categoriaIndex = categorias.indexOfFirst { categoria -> categoria.nombre == categoriaNombre }
+            if (categoriaIndex != -1) {
+                binding.spinnerCategoria.setSelection(categoriaIndex + 1)
+            }
+        }
+        
+        // Aplicar filtros pendientes si los hay (sin importar si el panel está visible)
+        if (filtrosPendientes) {
+            aplicarFiltros()
+            filtrosPendientes = false
+        }
+    }
+
+    private fun setupFiltrosRapidos() {
+        binding.checkMenos50.setOnCheckedChangeListener { _, isChecked ->
+            filtroMenos50Activo = isChecked
+            if (isChecked) binding.etPrecioMax.setText("50")
+            // No aplicar filtros automáticamente aquí
+        }
+        binding.checkPocasUnidades.setOnCheckedChangeListener { _, isChecked ->
+            filtroPocasUnidadesActivo = isChecked
+            // No aplicar filtros automáticamente aquí
+        }
+        binding.checkOferta.setOnCheckedChangeListener { _, isChecked ->
+            filtroOfertaActivo = isChecked
+            // No aplicar filtros automáticamente aquí
+        }
+        binding.checkNuevos.setOnCheckedChangeListener { _, isChecked ->
+            filtroNuevosActivo = isChecked
+            // No aplicar filtros automáticamente aquí
+        }
+        
+        // Actualizar estado visual de los CheckBox según los filtros activos
+        binding.checkMenos50.isChecked = filtroMenos50Activo
+        binding.checkPocasUnidades.isChecked = filtroPocasUnidadesActivo
+        binding.checkOferta.isChecked = filtroOfertaActivo
+        binding.checkNuevos.isChecked = filtroNuevosActivo
+    }
+
+    private fun limpiarFiltros() {
+        // Limpiar campos de precio
+        binding.etPrecioMin.setText("")
+        binding.etPrecioMax.setText("")
+        // Resetear spinners
+        binding.spinnerCategoria.setSelection(0)
+        binding.spinnerTipo.setSelection(0)
+        // Desactivar filtros rápidos
+        binding.checkMenos50.isChecked = false
+        binding.checkPocasUnidades.isChecked = false
+        binding.checkOferta.isChecked = false
+        binding.checkNuevos.isChecked = false
+        filtroMenos50Activo = false
+        filtroPocasUnidadesActivo = false
+        filtroOfertaActivo = false
+        filtroNuevosActivo = false
+        // Aplicar filtros (que ahora no tendrán restricciones)
+        aplicarFiltros()
+        Toast.makeText(this, getString(R.string.filter_cleared), Toast.LENGTH_SHORT).show()
     }
 
     private fun fetchProductosFromApi() {
         binding.progressBar.visibility = View.VISIBLE
         val service = ApiClient.retrofit.create(ProductService::class.java)
-
+        
         CoroutineScope(Dispatchers.IO).launch {
-            val response = try {
-                service.listAll()
+            try {
+                val response = service.listAll()
+                
+                withContext(Dispatchers.Main) {
+                    binding.progressBar.visibility = View.GONE
+                    if (response.isSuccessful) {
+                        val paginatedResponse = response.body()
+                        if (paginatedResponse != null && paginatedResponse.content.isNotEmpty()) {
+                            productosOriginales = paginatedResponse.content
+                            productosFiltrados = productosOriginales
+                            productosBuscados = productosFiltrados
+                            actualizarAdapter()
+                            
+                            // Aplicar filtros pendientes después de cargar productos
+                            if (filtrosPendientes) {
+                                aplicarFiltros()
+                                filtrosPendientes = false
+                            }
+                            
+                            Toast.makeText(
+                                this@ProductosActivity,
+                                "Productos cargados: ${paginatedResponse.content.size}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                this@ProductosActivity,
+                                "No se encontraron productos",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        val errorMessage = "Error del servidor: ${response.code()} - ${response.message()}"
+                        Toast.makeText(
+                            this@ProductosActivity,
+                            errorMessage,
+                            Toast.LENGTH_LONG
+                        ).show()
+                        // Log del error para debug
+                        println("Error HTTP: ${response.code()} - ${response.errorBody()?.string()}")
+                    }
+                }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     binding.progressBar.visibility = View.GONE
-                    val errorMessage = when (e) {
-                        is java.net.UnknownHostException -> "No se puede conectar al servidor. Verifica la URL."
-                        is java.net.SocketTimeoutException -> "Tiempo de espera agotado. Verifica tu conexión."
-                        is java.net.ConnectException -> "Error de conexión al servidor."
-                        else -> "Error de red: ${e.message}"
-                    }
                     Toast.makeText(
                         this@ProductosActivity,
-                        errorMessage,
-                        Toast.LENGTH_LONG
-                    ).show()
-                    e.printStackTrace() // Para debug en logcat
-                }
-                return@launch
-            }
-
-            withContext(Dispatchers.Main) {
-                binding.progressBar.visibility = View.GONE
-                if (response.isSuccessful) {
-                    val paginatedResponse = response.body()
-                    if (paginatedResponse != null && paginatedResponse.content.isNotEmpty()) {
-                        productosOriginales = paginatedResponse.content
-                        productosFiltrados = productosOriginales
-                        actualizarAdapter()
-                        Toast.makeText(
-                            this@ProductosActivity,
-                            "Productos cargados: ${paginatedResponse.content.size}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        Toast.makeText(
-                            this@ProductosActivity,
-                            "No se encontraron productos",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                } else {
-                    val errorMessage = "Error del servidor: ${response.code()} - ${response.message()}"
-                    Toast.makeText(
-                        this@ProductosActivity,
-                        errorMessage,
+                        "Error de conexión: ${e.message}",
                         Toast.LENGTH_LONG
                     ).show()
                     // Log del error para debug
-                    println("Error HTTP: ${response.code()} - ${response.errorBody()?.string()}")
+                    println("Error de excepción: ${e.message}")
                 }
             }
         }
@@ -148,8 +374,19 @@ class ProductosActivity : BaseActivity() {
     private fun aplicarFiltros() {
         val precioMinStr = binding.etPrecioMin.text.toString()
         val precioMaxStr = binding.etPrecioMax.text.toString()
-        val categoriaSeleccionada = binding.spinnerCategoria.selectedItem.toString()
-        val tipoSeleccionado = binding.spinnerTipo.selectedItem.toString()
+        
+        // Verificar que los spinners estén configurados antes de acceder a sus valores
+        val categoriaSeleccionada = if (binding.spinnerCategoria.adapter != null) {
+            binding.spinnerCategoria.selectedItem?.toString() ?: getString(R.string.filter_all_categories)
+        } else {
+            getString(R.string.filter_all_categories)
+        }
+        
+        val tipoSeleccionado = if (binding.spinnerTipo.adapter != null) {
+            binding.spinnerTipo.selectedItem?.toString() ?: getString(R.string.filter_all_types)
+        } else {
+            getString(R.string.filter_all_types)
+        }
 
         productosFiltrados = productosOriginales.filter { producto ->
             var cumpleFiltros = true
@@ -178,19 +415,30 @@ class ProductosActivity : BaseActivity() {
                 cumpleFiltros = cumpleFiltros && producto.tipo == tipoSeleccionado
             }
 
+            // Filtro de ofertas (productos con descuento)
+            if (filtroOfertaActivo) {
+                cumpleFiltros = cumpleFiltros && producto.descuentoPorcentajeCalculado > 0
+            }
+
+            // Filtro de productos nuevos (últimos 3 para datos mock)
+            if (filtroNuevosActivo) {
+                val indice = productosOriginales.indexOf(producto)
+                cumpleFiltros = cumpleFiltros && indice >= productosOriginales.size - 3
+            }
+
+            // Filtro de pocas unidades (stock bajo)
+            if (filtroPocasUnidadesActivo) {
+                cumpleFiltros = cumpleFiltros && producto.stock <= 5
+            }
+
             cumpleFiltros
         }
 
+        productosBuscados = productosFiltrados
         actualizarAdapter()
-        
-        if (productosFiltrados.isEmpty()) {
-            Toast.makeText(this, getString(R.string.filter_no_results), Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, getString(R.string.filter_results_found, productosFiltrados.size), Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun actualizarAdapter() {
-        adapter.updateData(productosFiltrados)
+        adapter.updateData(productosBuscados)
     }
 }
