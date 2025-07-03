@@ -5,6 +5,8 @@
     <color name="primary">#FFFFFF</color>           <!-- Botones blancos -->
     <color name="onPrimary">#000000</color>         <!-- Texto negro sobre botones blancos -->
     <color name="surface">#2C2C2C</color>           <!-- Fondo gris para tarjetas -->
+    <color name="onSurface">#FFFFFF</color>         <!-- Texto sobre superficie -->
+    <color name="onSurfaceVariant">#B0B0B0</color>  <!-- Texto secundario sobre superficie -->
     
     <!-- Colores para filtros en modo oscuro -->
     <color name="filter_background">#2C2C2C</color>
@@ -14,4 +16,5 @@
     <color name="filter_input_background">#3A3A3A</color>
     <color name="menos_50_icon">#000000</color>
     <color name="notificacion_icon">#FFFFFF</color>
+    <color name="back_button">@color/primary</color>
 </resources>

@@ -1,8 +1,8 @@
 package com.asparrin.carlos.estiloya.ui.disenar
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
@@ -18,9 +18,9 @@ import com.asparrin.carlos.estiloya.BuildConfig
 import com.asparrin.carlos.estiloya.R
 import com.asparrin.carlos.estiloya.databinding.ActivityDisenarBinding
 import com.asparrin.carlos.estiloya.ui.base.BaseActivity
-import com.asparrin.carlos.estiloya.ui.disenar.api.DisenarService
-import com.asparrin.carlos.estiloya.ui.disenar.api.StabilityImageRequest
-import com.asparrin.carlos.estiloya.ui.disenar.api.TextPrompt
+import com.asparrin.carlos.estiloya.ui.disenar.api.*
+import com.asparrin.carlos.estiloya.viewModel.CustomDesignViewModel
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.File
@@ -32,19 +32,20 @@ import java.util.Date
 class DisenarActivity : BaseActivity() {
 
     private lateinit var binding: ActivityDisenarBinding
-    private var lastBitmap: Bitmap? = null
+    private lateinit var viewModel: CustomDesignViewModel
+    private var lastBitmap = null as android.graphics.Bitmap?
+    private var lastPrompt = ""
 
     override fun getLayoutResourceId(): Int = R.layout.activity_disenar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Asociar el binding al contenido inyectado
-        val contentFrame = findViewById<FrameLayout>(R.id.content_frame)
+        val contentFrame = findViewById<android.widget.FrameLayout>(R.id.content_frame)
         val child = contentFrame.getChildAt(0)
-        binding = ActivityDisenarBinding.bind(child)
-
+        binding = com.asparrin.carlos.estiloya.databinding.ActivityDisenarBinding.bind(child)
+        viewModel = androidx.lifecycle.ViewModelProvider(this)[com.asparrin.carlos.estiloya.viewModel.CustomDesignViewModel::class.java]
         setupListeners()
+        setupViewModelObservers()
     }
 
     private fun setupListeners() {
@@ -52,32 +53,24 @@ class DisenarActivity : BaseActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 generarImagen()
                 true
-            } else {
-                false
-            }
+            } else false
         }
 
-        binding.btnGenerar.setOnClickListener {
-            generarImagen()
-        }
-
+        binding.btnGenerar.setOnClickListener { generarImagen() }
         binding.btnReiniciar.setOnClickListener {
             binding.etPrompt.text.clear()
             binding.ivResultado.setImageBitmap(null)
             lastBitmap = null
         }
-
         binding.btnGuardar.setOnClickListener {
-            // Sin funcionalidad por ahora
+            guardarDiseno()
         }
+    }
 
-        binding.btnDescargar.setOnClickListener {
-            if (lastBitmap != null) {
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 100)
-                } else {
-                    guardarImagenEnGaleria(lastBitmap!!)
-                }
+    private fun setupViewModelObservers() {
+        viewModel.error.observe(this) { error ->
+            if (error != null) {
+                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -85,82 +78,114 @@ class DisenarActivity : BaseActivity() {
     private fun generarImagen() {
         val promptText = binding.etPrompt.text.toString().trim()
         if (promptText.isEmpty()) {
-            Toast.makeText(this, "Escribe tu prompt primero", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Por favor ingresa una instrucción para generar la imagen", Toast.LENGTH_SHORT).show()
             return
         }
+        lastPrompt = promptText
+        val prompt = promptText
 
-        binding.btnGenerar.isEnabled = false
-        binding.btnGenerar.text = "Generando…"
+        binding.btnGenerar.apply {
+            isEnabled = false
+            text = "Generando…"
+        }
+        binding.progressBarImagen.visibility = android.view.View.VISIBLE
+        binding.ivResultado.setImageBitmap(null)
 
         lifecycleScope.launch {
             try {
-                // Construye la petición con tu prompt
-                val request = StabilityImageRequest(
-                    textPrompts = listOf(TextPrompt(text = promptText)),
-                    cfg_scale = 7.0f,
-                    height = 1024,
-                    width = 1024,
-                    samples = 1
+                val request = GeminiRequest(
+                    contents = listOf(
+                        GeminiContent(parts = listOf(GeminiPart(text = prompt)))
+                    ),
+                    generationConfig = GeminiGenerationConfig(
+                        responseModalities = listOf("TEXT", "IMAGE")
+                    )
                 )
+                val url = "v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${BuildConfig.GEMINI_API_KEY}"
+                val response = DisenarService.api.generarImagen(url, request)
 
-                // Llama al servicio; ya no es necesario pasar apiKey
-                val response = DisenarService.api.generarImagen(
-                    request = request
-                )
-
-                val artifact = response.artifacts.firstOrNull()
-                if (artifact != null) {
-                    // Decodifica Base64 y muestra en el ImageView
-                    val imageBytes = Base64.decode(artifact.base64, Base64.DEFAULT)
-                    val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                    binding.ivResultado.setImageBitmap(bitmap)
-                    lastBitmap = bitmap
+                if (response.isSuccessful) {
+                    val gemini = response.body()
+                    Log.d("GeminiRaw", gemini.toString())
+                    val base64 = gemini
+                        ?.candidates
+                        ?.flatMap { it.content.parts }
+                        ?.firstOrNull { it.inlineData?.data != null }
+                        ?.inlineData
+                        ?.data
+                    if (base64 != null) {
+                        val bytes = Base64.decode(base64, Base64.DEFAULT)
+                        val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                        if (bmp != null) {
+                            binding.ivResultado.setImageBitmap(bmp)
+                            lastBitmap = bmp
+                        } else {
+                            Toast.makeText(this@DisenarActivity, "No se pudo decodificar la imagen", Toast.LENGTH_SHORT).show()
+                            Log.e("DisenarActivity", "Bitmap nulo tras decodificar")
+                        }
+                    } else {
+                        Toast.makeText(this@DisenarActivity, "No se generó ninguna imagen", Toast.LENGTH_SHORT).show()
+                        Log.e("DisenarActivity", "No se encontró inlineData.data")
+                    }
                 } else {
-                    Toast.makeText(
-                        this@DisenarActivity,
-                        "No se generó ninguna imagen",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val err = response.errorBody()?.string()
+                    Toast.makeText(this@DisenarActivity, "Error ${response.code()}: $err", Toast.LENGTH_LONG).show()
+                    Log.e("DisenarActivity", "HTTP ${response.code()} – $err")
                 }
-
             } catch (e: HttpException) {
-                // Lee el body de error para diagnóstico
-                val errBody = e.response()?.errorBody()?.string()
-                Log.e("DisenarActivity", "HTTP ${e.code()} – $errBody")
-                Toast.makeText(
-                    this@DisenarActivity,
-                    "Error ${e.code()}: $errBody",
-                    Toast.LENGTH_LONG
-                ).show()
-
+                Toast.makeText(this@DisenarActivity, "HTTP exception: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.e("DisenarActivity", "HTTP Exception", e)
             } catch (e: Exception) {
-                Log.e("DisenarActivity", "Error generando imagen", e)
-                Toast.makeText(
-                    this@DisenarActivity,
-                    "Error al generar imagen: ${e.localizedMessage}",
-                    Toast.LENGTH_LONG
-                ).show()
-
+                Toast.makeText(this@DisenarActivity, "Error al generar imagen: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                Log.e("DisenarActivity", "Exception", e)
             } finally {
-                binding.btnGenerar.isEnabled = true
-                binding.btnGenerar.text = "Generar imagen"
+                try {
+                    binding.btnGenerar.apply {
+                        isEnabled = true
+                        text = "Generar imagen"
+                    }
+                    binding.progressBarImagen.visibility = android.view.View.GONE
+                } catch (e: Exception) {
+                    Log.e("DisenarActivity", "Error en finally block", e)
+                }
             }
         }
     }
 
-    private fun guardarImagenEnGaleria(bitmap: Bitmap) {
-        val sdf = SimpleDateFormat("yyyyMMdd_HHmmss")
-        val fileName = "estiloya_${sdf.format(Date())}.png"
-        val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        val file = File(picturesDir, fileName)
+    private fun guardarDiseno() {
+        if (lastBitmap == null) {
+            Toast.makeText(this, "Primero genera una imagen", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        if (lastPrompt.isEmpty()) {
+            Toast.makeText(this, "No hay descripción para guardar", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Convertir bitmap a Base64 para enviar al servidor
+        val outputStream = java.io.ByteArrayOutputStream()
+        lastBitmap!!.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, outputStream)
+        val base64Image = android.util.Base64.encodeToString(outputStream.toByteArray(), android.util.Base64.DEFAULT)
+        
+        // Guardar el diseño
+        viewModel.guardarDiseno(lastPrompt, "data:image/png;base64,$base64Image")
+        
+        Toast.makeText(this, "Diseño guardado exitosamente", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun guardarImagenEnGaleria(bitmap: android.graphics.Bitmap) {
+        val sdf = java.text.SimpleDateFormat("yyyyMMdd_HHmmss")
+        val fileName = "estiloya_${sdf.format(java.util.Date())}.png"
+        val downloadsDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS)
+        val file = java.io.File(downloadsDir, fileName)
         try {
-            val out = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-            out.flush()
-            out.close()
-            Toast.makeText(this, "Imagen guardada en Galería", Toast.LENGTH_SHORT).show()
-        } catch (e: IOException) {
-            Toast.makeText(this, "Error al guardar imagen: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            java.io.FileOutputStream(file).use { out ->
+                bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, out)
+            }
+            Toast.makeText(this, "Imagen descargada en Descargas", Toast.LENGTH_SHORT).show()
+        } catch (e: java.io.IOException) {
+            Toast.makeText(this, "Error al descargar: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
         }
     }
 }

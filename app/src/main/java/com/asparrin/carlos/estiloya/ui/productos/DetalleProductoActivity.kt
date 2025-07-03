@@ -41,8 +41,8 @@ class DetalleProductoActivity : BaseActivity() {
         // Configurar imagen
         Glide.with(this)
             .load(producto.imagenUrl)
-            .placeholder(R.drawable.ic_producto_dark)
-            .error(R.drawable.ic_producto_dark)
+            .placeholder(R.drawable.ic_producto)
+            .error(R.drawable.ic_producto)
             .into(binding.imageProducto)
 
         // Configurar información básica

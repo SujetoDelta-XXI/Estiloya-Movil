@@ -72,7 +72,7 @@
                                 android:layout_height="48dp"
                                 android:background="@drawable/bg_circle_accent"
                                 android:padding="@dimen/padding_small"
-                                android:src="@drawable/ic_menos_50_light" />
+                                android:src="@drawable/ic_menos_50" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -102,7 +102,7 @@
                                 android:layout_height="48dp"
                                 android:background="@drawable/bg_circle_warning"
                                 android:padding="@dimen/padding_small"
-                                android:src="@drawable/ic_producto_light" />
+                                android:src="@drawable/ic_producto" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -132,7 +132,7 @@
                                 android:layout_height="48dp"
                                 android:background="@drawable/bg_circle_accent"
                                 android:padding="@dimen/padding_small"
-                                android:src="@drawable/ic_oferta_light" />
+                                android:src="@drawable/ic_oferta" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -162,7 +162,7 @@
                                 android:layout_height="48dp"
                                 android:background="@drawable/bg_circle_success"
                                 android:padding="@dimen/padding_small"
-                                android:src="@drawable/ic_nuevo_light" />
+                                android:src="@drawable/ic_nuevo" />
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -173,6 +173,22 @@
                                 android:textSize="@dimen/text_small" />
 
                         </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Segunda fila de accesos rápidos -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginTop="@dimen/margin_medium">
+
+                        <!-- Espacio vacío para mantener el layout -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="4" />
 
                     </LinearLayout>
 

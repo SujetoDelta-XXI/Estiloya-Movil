@@ -16,15 +16,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.button.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
-        }
-        binding.button4.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
-        }
+        // MainActivity ya no se usa como pantalla principal
+        // La navegación se maneja desde SplashActivity
     }
 
-    // Methods for onClick attributes in layout
+    // Methods for onClick attributes in layout (mantenidos por compatibilidad)
     fun onLoginClicked(view: View) {
         startActivity(Intent(this, LoginActivity::class.java))
     }

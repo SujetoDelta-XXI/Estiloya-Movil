@@ -28,8 +28,8 @@ class ProductAdapter(
             // Configurar imagen
             Glide.with(binding.root.context)
                 .load(producto.imagenUrl)
-                .placeholder(R.drawable.ic_producto_dark)
-                .error(R.drawable.ic_producto_dark)
+                .placeholder(R.drawable.ic_producto)
+                .error(R.drawable.ic_producto)
                 .into(binding.imageProducto)
             
             // Descuento y precios

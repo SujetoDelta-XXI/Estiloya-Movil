@@ -27,7 +27,7 @@
             android:id="@+id/iconHome"
             android:layout_width="@dimen/icon_nav"
             android:layout_height="@dimen/icon_nav"
-            android:src="@drawable/ic_home_dark"
+            android:src="@drawable/ic_home"
             android:contentDescription="@string/nav_home"
             android:layout_marginBottom="@dimen/margin_small"/>
 
@@ -61,7 +61,7 @@
             android:id="@+id/iconProductos"
             android:layout_width="@dimen/icon_nav"
             android:layout_height="@dimen/icon_nav"
-            android:src="@drawable/ic_productos_dark"
+            android:src="@drawable/ic_productos"
             android:contentDescription="@string/nav_productos"
             android:layout_marginBottom="@dimen/margin_small"/>
 
@@ -95,7 +95,7 @@
             android:id="@+id/iconDisenar"
             android:layout_width="@dimen/icon_nav"
             android:layout_height="@dimen/icon_nav"
-            android:src="@drawable/ic_estilo_dark"
+            android:src="@drawable/ic_estilo"
             android:contentDescription="@string/nav_disenar"
             android:layout_marginBottom="@dimen/margin_small"/>
 

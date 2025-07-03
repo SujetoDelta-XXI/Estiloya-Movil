@@ -22,6 +22,11 @@ android {
                 "STABILITY_API_KEY",
                 "\"${project.property("stability.api.key")}\""
         )
+        buildConfigField(
+                "String",
+                "GEMINI_API_KEY",
+                "\"${project.property("gemini.api.key")}\""
+        )
     }
 
     buildTypes {

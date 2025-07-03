@@ -17,6 +17,7 @@ class SessionManager(context: Context) {
     }
 
     fun obtenerNombre(): String? = prefs.getString("nombre", null)
+    fun obtenerCorreo(): String? = prefs.getString("correo", null)
 
     fun estaLogueado(): Boolean = prefs.getBoolean("logueado", false)
 

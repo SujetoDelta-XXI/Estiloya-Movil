@@ -18,6 +18,7 @@ import com.asparrin.carlos.estiloya.ui.components.CategoriasAdapter
 import com.asparrin.carlos.estiloya.ui.components.ProductAdapter
 import com.asparrin.carlos.estiloya.ui.productos.DetalleProductoActivity
 import com.asparrin.carlos.estiloya.ui.productos.ProductosActivity
+import com.asparrin.carlos.estiloya.ui.disenar.MisDisenosActivity
 import com.asparrin.carlos.estiloya.viewModel.HomeViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
@@ -79,9 +80,9 @@ class HomeActivity : BaseActivity() {
 
     private fun setupBanners() {
         val banners = listOf(
-            Banner(1, R.drawable.imagen_background, "Ofertas Especiales", "Descuentos hasta 50%"),
-            Banner(2, R.drawable.imagen_background, "Nuevos Productos", "Descubre las últimas tendencias"),
-            Banner(3, R.drawable.imagen_background, "Envío Gratis", "En compras superiores a S/ 100")
+            Banner(1, R.drawable.background, "Ofertas Especiales", "Descuentos hasta 50%"),
+            Banner(2, R.drawable.background, "Nuevos Productos", "Descubre las últimas tendencias"),
+            Banner(3, R.drawable.background, "Envío Gratis", "En compras superiores a S/ 100")
         )
 
         bannersAdapter = BannersAdapter(banners) { banner ->

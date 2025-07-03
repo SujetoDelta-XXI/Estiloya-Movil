@@ -42,7 +42,7 @@
         android:id="@+id/iconUser"
         android:layout_width="@dimen/icon_large"
         android:layout_height="@dimen/icon_large"
-        android:src="@drawable/ic_user_dark"
+        android:src="@drawable/ic_user"
         android:contentDescription="Perfil"
         android:clickable="true"
         android:focusable="true"

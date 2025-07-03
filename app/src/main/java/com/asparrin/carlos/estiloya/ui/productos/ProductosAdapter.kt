@@ -1,10 +1,8 @@
 package com.asparrin.carlos.estiloya.ui.productos
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.asparrin.carlos.estiloya.R
 import com.asparrin.carlos.estiloya.data.model.Producto
@@ -30,8 +28,8 @@ class ProductosAdapter(
             // Configurar imagen
             Glide.with(binding.root.context)
                 .load(producto.imagenUrl)
-                .placeholder(R.drawable.ic_producto_dark)
-                .error(R.drawable.ic_producto_dark)
+                .placeholder(R.drawable.ic_producto)
+                .error(R.drawable.ic_producto)
                 .into(binding.imageProducto)
             
             // Descuento y precios

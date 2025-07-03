@@ -25,6 +25,11 @@ class LoginActivity : AppCompatActivity() {
             val correo = binding.emailEditText.text.toString().trim()
             val clave = binding.passwordEditText.text.toString()
 
+            if (correo.isEmpty() || clave.isEmpty()) {
+                Toast.makeText(this, "Por favor completa todos los campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val usuario = MockUsuario.validarLogin(correo, clave)
 
             if (usuario != null) {
@@ -39,8 +44,18 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        binding.registerLink.setOnClickListener {
+        binding.registerButton.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
+        }
+
+        binding.forgotPasswordText.setOnClickListener {
+            val correo = binding.emailEditText.text.toString().trim()
+            if (correo.isEmpty()) {
+                Toast.makeText(this, "Por favor ingresa tu correo primero", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            Toast.makeText(this, "Se envió un enlace de recuperación a $correo", Toast.LENGTH_LONG).show()
         }
     }
 }

@@ -1,42 +1,63 @@
+// src/main/java/com/asparrin/carlos/estiloya/ui/disenar/api/DisenarApi.kt
+
 package com.asparrin.carlos.estiloya.ui.disenar.api
 
-import retrofit2.http.Body
-import retrofit2.http.Header
-import retrofit2.http.POST
-import retrofit2.http.Path
 import com.google.gson.annotations.SerializedName
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.Headers
+import retrofit2.http.POST
+import retrofit2.http.Url
 
-data class TextPrompt(
-    val text: String,
-    val weight: Float = 1.0f
+// — Request Models —
+
+data class GeminiPart(
+    val text: String
 )
 
-data class StabilityImageRequest(
-    @SerializedName("text_prompts")
-    val textPrompts: List<TextPrompt>,
-    val cfg_scale: Float = 7.0f,
-    val height: Int = 1024,
-    val width: Int = 1024,
-    val samples: Int = 1
-    // puedes añadir `val steps: Int = 50` si quieres controlar el número de pasos
+data class GeminiContent(
+    val parts: List<GeminiPart>
 )
 
-data class StabilityImageResponse(
-    val artifacts: List<Artifact>
-) {
-    data class Artifact(
-        val base64: String,
-        @SerializedName("finishReason")
-        val finishReason: String,
-        val seed: Long
-    )
-}
+data class GeminiGenerationConfig(
+    val responseModalities: List<String>
+)
+
+data class GeminiRequest(
+    val contents: List<GeminiContent>,
+    val generationConfig: GeminiGenerationConfig
+)
+
+// — Response Models —
+
+data class GeminiResponse(
+    @SerializedName("candidates")
+    val candidates: List<GeminiCandidate>
+)
+
+data class GeminiCandidate(
+    val content: GeminiResponseContent
+)
+
+data class GeminiResponseContent(
+    val parts: List<GeminiPartResponse>
+)
+
+data class GeminiPartResponse(
+    val text: String? = null,
+    val inlineData: GeminiInlineData? = null
+)
+
+data class GeminiInlineData(
+    val mimeType: String?,
+    val data: String?   // aquí cae tu Base64
+)
 
 interface DisenarApi {
-    @POST("v1alpha/generation/stable-diffusion-v1-6/text-to-image")
+    @Headers("Content-Type: application/json")
+    @POST
     suspend fun generarImagen(
-        @Header("Authorization") apiKey: String = "Bearer sk-T3h6J10LqZSvSo5NdPafwShBYjAR7VKrZTFpNy8vHnazjRIh",
-        @Header("Content-Type") contentType: String = "application/json",
-        @Body request: StabilityImageRequest
-    ): StabilityImageResponse
+        @Url url: String,
+        @Body request: GeminiRequest
+    ): Response<GeminiResponse>
 }

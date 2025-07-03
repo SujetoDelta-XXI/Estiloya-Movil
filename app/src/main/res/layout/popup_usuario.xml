@@ -10,10 +10,10 @@
         android:minWidth="@dimen/popup_width">
 
         <!-- Opción: Perfil -->
-        <LinearLayout style="@style/PopupItemContainer">
+        <LinearLayout android:id="@+id/layoutPerfil" style="@style/PopupItemContainer">
             <ImageView
                 android:id="@+id/iconPerfil"
-                android:src="@drawable/ic_user_dark"
+                android:src="@drawable/ic_user"
                 style="@style/PopupIcon" />
             <TextView
                 android:id="@+id/opPerfil"
@@ -25,7 +25,7 @@
         <LinearLayout style="@style/PopupItemContainer">
             <ImageView
                 android:id="@+id/iconPedidos"
-                android:src="@drawable/ic_pedidos_dark"
+                android:src="@drawable/ic_pedidos"
                 style="@style/PopupIcon" />
             <TextView
                 android:id="@+id/opPedidos"
@@ -34,10 +34,10 @@
         </LinearLayout>
 
         <!-- Opción: Diseños -->
-        <LinearLayout style="@style/PopupItemContainer">
+        <LinearLayout android:id="@+id/layoutDisenos" style="@style/PopupItemContainer">
             <ImageView
                 android:id="@+id/iconDisenos"
-                android:src="@drawable/ic_disenos_dark"
+                android:src="@drawable/ic_disenos"
                 style="@style/PopupIcon" />
             <TextView
                 android:id="@+id/opDisenos"
@@ -56,7 +56,7 @@
         <LinearLayout style="@style/PopupItemContainer">
             <ImageView
                 android:id="@+id/iconTheme"
-                android:src="@drawable/ic_moon"
+                android:src="@drawable/ic_sun"
                 style="@style/PopupIcon" />
             <TextView
                 android:id="@+id/tvModo"
@@ -74,7 +74,7 @@
             style="@style/PopupItemContainer">
             <ImageView
                 android:id="@+id/iconLogout"
-                android:src="@drawable/ic_logout_dark"
+                android:src="@drawable/ic_logout"
                 style="@style/PopupIcon" />
             <TextView
                 android:id="@+id/opLogout"

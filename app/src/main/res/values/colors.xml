@@ -22,6 +22,8 @@
 
     <!-- Colores adicionales para el nuevo layout -->
     <color name="surface">#FFFFFF</color>
+    <color name="onSurface">#000000</color>
+    <color name="onSurfaceVariant">#666666</color>
     <color name="outline">#E0E0E0</color>
     <color name="accent">#666666</color>
     <color name="success">#4CAF50</color>
@@ -30,6 +32,8 @@
 
     <color name="menos_50_icon">#FFFFFF</color>
     <color name="notificacion_icon">#000000</color>
+
+    <color name="back_button">@color/primary</color>
 
 </resources>
 

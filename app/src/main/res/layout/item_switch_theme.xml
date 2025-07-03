@@ -13,7 +13,7 @@
         android:id="@+id/iconTheme"
         android:layout_width="@dimen/icon_medium"
         android:layout_height="@dimen/icon_medium"
-        android:src="@drawable/ic_moon"
+        android:src="@drawable/ic_sun"
         android:contentDescription="Icono de tema"
         android:layout_marginEnd="@dimen/margin_medium" />
 
