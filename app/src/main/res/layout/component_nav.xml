@@ -53,7 +53,7 @@
         android:background="?selectableItemBackground"
         android:padding="@dimen/padding_small"
         app:layout_constraintStart_toEndOf="@id/homeSection"
-        app:layout_constraintEnd_toStartOf="@id/carritoSection"
+        app:layout_constraintEnd_toStartOf="@id/disenarSection"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -75,58 +75,6 @@
             android:gravity="center" />
     </LinearLayout>
 
-    <!-- Carrito Section -->
-    <LinearLayout
-        android:id="@+id/carritoSection"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?selectableItemBackground"
-        android:padding="@dimen/padding_small"
-        app:layout_constraintStart_toEndOf="@id/productosSection"
-        app:layout_constraintEnd_toStartOf="@id/disenarSection"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/margin_small">
-
-            <ImageView
-                android:id="@+id/iconCarrito"
-                android:layout_width="@dimen/icon_nav"
-                android:layout_height="@dimen/icon_nav"
-                android:src="@drawable/ic_cart"
-                android:contentDescription="@string/nav_carrito"/>
-
-            <TextView
-                android:id="@+id/badgeCarrito"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="top|end"
-                android:background="@drawable/bg_circle_accent"
-                android:text="0"
-                android:textSize="10sp"
-                android:textColor="@android:color/white"
-                android:gravity="center"
-                android:visibility="gone"/>
-
-        </FrameLayout>
-
-        <TextView
-            android:id="@+id/textCarrito"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/nav_carrito"
-            android:textSize="@dimen/text_medium"
-            android:textColor="?android:textColorPrimary"
-            android:gravity="center" />
-    </LinearLayout>
-
     <!-- Diseñar Section -->
     <LinearLayout
         android:id="@+id/disenarSection"
@@ -138,7 +86,7 @@
         android:focusable="true"
         android:background="?selectableItemBackground"
         android:padding="@dimen/padding_small"
-        app:layout_constraintStart_toEndOf="@id/carritoSection"
+        app:layout_constraintStart_toEndOf="@id/productosSection"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">

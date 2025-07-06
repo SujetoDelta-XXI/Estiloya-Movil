@@ -43,4 +43,8 @@ interface AuthService {
     
     @PUT("usuario/perfil")
     suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<ProfileResponse>
+    
+    // Endpoint para actualizar datos del usuario
+    @PUT("me")
+    suspend fun updateMe(@Body request: UpdateMeRequest): Response<Usuario>
 } 

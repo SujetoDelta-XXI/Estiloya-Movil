@@ -19,11 +19,11 @@ data class Producto(
     val nombre: String,
     val descripcion: String,
     val imagen: String,
-    val precio: @RawValue BigDecimal,
+    val precio: @RawValue BigDecimal? = null,
     val stock: Int,
     val tipo: String,
     @SerializedName("fecha_creacion")
-    val fechaCreacion: @RawValue LocalDate,
+    val fechaCreacion: @RawValue LocalDate? = null,
     val estado: String,
     val categoria: @RawValue Categoria? = null,
     val descuento: Descuento? = null
@@ -38,11 +38,11 @@ data class Producto(
      * Precio tras aplicar el descuento.
      */
     val precioConDescuento: BigDecimal
-        get() = if (descuentoPorcentajeCalculado > 0) {
+        get() = if (precio != null && descuentoPorcentajeCalculado > 0) {
             precio.multiply(BigDecimal.valueOf((100 - descuentoPorcentajeCalculado).toLong()))
                 .divide(BigDecimal.valueOf(100))
         } else {
-            precio
+            precio ?: BigDecimal.ZERO
         }
 
     /**

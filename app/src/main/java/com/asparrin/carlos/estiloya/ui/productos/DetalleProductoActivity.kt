@@ -11,6 +11,7 @@ import com.asparrin.carlos.estiloya.ui.components.CantidadDialog
 import androidx.lifecycle.ViewModelProvider
 import com.asparrin.carlos.estiloya.viewModel.CarritoViewModel
 import com.bumptech.glide.Glide
+import java.math.BigDecimal
 
 class DetalleProductoActivity : BaseActivity() {
 
@@ -29,12 +30,17 @@ class DetalleProductoActivity : BaseActivity() {
         binding = ActivityDetalleProductoBinding.bind(child)
 
         // Obtener el producto pasado como extra
-        producto = intent.getParcelableExtra("producto")
-        
-        if (producto != null) {
-            mostrarDetallesProducto(producto!!)
-        } else {
-            Toast.makeText(this, "Error al cargar el producto", Toast.LENGTH_SHORT).show()
+        try {
+            producto = intent.getParcelableExtra("producto")
+            
+            if (producto != null) {
+                mostrarDetallesProducto(producto!!)
+            } else {
+                Toast.makeText(this, "Error al cargar el producto", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error al cargar el producto: ${e.message}", Toast.LENGTH_SHORT).show()
             finish()
         }
 
@@ -60,6 +66,7 @@ class DetalleProductoActivity : BaseActivity() {
         binding.textId.text = producto.id.toString()
 
         // Configurar precios y descuento
+        val precio = producto.precio ?: BigDecimal.ZERO
         if (producto.descuentoPorcentajeCalculado > 0) {
             // Mostrar descuento
             binding.textDescuento.visibility = android.view.View.VISIBLE
@@ -67,7 +74,7 @@ class DetalleProductoActivity : BaseActivity() {
             
             // Mostrar precio original tachado
             binding.textPrecioOriginal.visibility = android.view.View.VISIBLE
-            binding.textPrecioOriginal.text = "S/ ${String.format("%.2f", producto.precio)}"
+            binding.textPrecioOriginal.text = "S/ ${String.format("%.2f", precio)}"
             binding.textPrecioOriginal.paintFlags = 
                 binding.textPrecioOriginal.paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
             
@@ -78,21 +85,13 @@ class DetalleProductoActivity : BaseActivity() {
             // Sin descuento
             binding.textDescuento.visibility = android.view.View.GONE
             binding.textPrecioOriginal.visibility = android.view.View.GONE
-            binding.textPrecio.text = "S/ ${String.format("%.2f", producto.precio)}"
+            binding.textPrecio.text = "S/ ${String.format("%.2f", precio)}"
         }
     }
 
     private fun setupListeners() {
         binding.btnAgregar.setOnClickListener {
             producto?.let { mostrarDialogoCantidad(it) }
-        }
-
-        binding.btnComprar.setOnClickListener {
-            producto?.let { 
-                // Agregar 1 unidad y ir al carrito
-                carritoViewModel.agregarProducto(this, it.id, 1)
-                Toast.makeText(this, "Producto agregado al carrito", Toast.LENGTH_SHORT).show()
-            }
         }
     }
     

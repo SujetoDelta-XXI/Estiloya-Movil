@@ -17,6 +17,14 @@ class CarritoAdapter(
 
     class CarritoViewHolder(private val binding: ItemCarritoBinding) : RecyclerView.ViewHolder(binding.root) {
         
+        private fun calcularSubtotal(precio: Double, cantidad: Int): Double {
+            return precio * cantidad
+        }
+        
+        private fun calcularPrecioConDescuento(precio: Double, descuento: Double): Double {
+            return precio - (precio * descuento / 100.0)
+        }
+        
         fun bind(
             item: CarritoItem,
             onCantidadChange: (Long, Int) -> Unit,
@@ -32,14 +40,18 @@ class CarritoAdapter(
                 .error(R.drawable.ic_producto)
                 .into(binding.imageProducto)
             
-            // Configurar precio unitario
-            binding.textPrecioUnitario.text = "S/ ${"%.2f".format(item.precio)}"
+            // Calcular precio con descuento una sola vez
+            val precioConDescuento = calcularPrecioConDescuento(item.precio, item.descuento)
+            
+            // Configurar precio unitario con descuento aplicado
+            binding.textPrecioUnitario.text = "S/ ${"%.2f".format(precioConDescuento)}"
             
             // Configurar cantidad
             binding.textCantidad.text = item.cantidad.toString()
             
-            // Configurar subtotal
-            binding.textSubtotal.text = "S/ ${"%.2f".format(item.subtotal)}"
+            // Configurar subtotal (precio con descuento * cantidad)
+            val subtotalCalculado = calcularSubtotal(precioConDescuento, item.cantidad)
+            binding.textSubtotal.text = "S/ ${"%.2f".format(subtotalCalculado)}"
             
             // Configurar botón menos
             binding.btnMenos.setOnClickListener {
@@ -82,7 +94,16 @@ class CarritoAdapter(
     override fun getItemCount(): Int = items.size
 
     fun updateData(nuevosItems: List<CarritoItem>) {
+        val oldItems = items
         items = nuevosItems
-        notifyDataSetChanged()
+        
+        // Usar DiffUtil para actualización eficiente
+        if (oldItems.isNotEmpty() && nuevosItems.isNotEmpty()) {
+            // Si hay cambios, actualizar todo el dataset
+            notifyDataSetChanged()
+        } else {
+            // Si es la primera carga o se vació el carrito
+            notifyDataSetChanged()
+        }
     }
 } 

@@ -33,6 +33,7 @@ class ProductAdapter(
                 .into(binding.imageProducto)
             
             // Descuento y precios
+            val precio = producto.precio ?: java.math.BigDecimal.ZERO
             if (producto.descuentoPorcentajeCalculado > 0) {
                 binding.textDescuento.apply {
                     visibility = View.VISIBLE
@@ -40,14 +41,14 @@ class ProductAdapter(
                 }
                 binding.textPrecioOriginal.apply {
                     visibility = View.VISIBLE
-                    text = "S/ ${"%.2f".format(producto.precio)}"
+                    text = "S/ ${"%.2f".format(precio)}"
                     paintFlags = paintFlags or android.graphics.Paint.STRIKE_THRU_TEXT_FLAG
                 }
                 binding.textPrecio.text = "S/ ${"%.2f".format(producto.precioConDescuento)}"
             } else {
                 binding.textDescuento.visibility = View.GONE
                 binding.textPrecioOriginal.visibility = View.GONE
-                binding.textPrecio.text = "S/ ${"%.2f".format(producto.precio)}"
+                binding.textPrecio.text = "S/ ${"%.2f".format(precio)}"
             }
             
             // Configurar click listeners

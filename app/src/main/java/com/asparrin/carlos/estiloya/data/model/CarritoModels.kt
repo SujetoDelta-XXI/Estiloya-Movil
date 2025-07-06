@@ -11,7 +11,8 @@ data class CarritoItem(
     val precio: Double,
     val cantidad: Int,
     val subtotal: Double,
-    val imagen: String
+    val imagen: String,
+    val descuento: Double = 0.0
 )
 
 // Modelo para agregar producto al carrito
@@ -38,10 +39,9 @@ data class CarritoResponse(
 // Modelo para resumen de compra
 data class ResumenCompra(
     val subtotal: Double,
-    val descuento: Double,
-    val total: Double,
-    @SerializedName("cantidadItems")
-    val cantidadItems: Int
+    val igv: Double,
+    val envio: Double,
+    val total: Double
 )
 
 // Modelo para respuesta del resumen

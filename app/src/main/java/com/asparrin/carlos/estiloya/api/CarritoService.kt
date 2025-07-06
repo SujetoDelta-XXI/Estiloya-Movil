@@ -18,7 +18,7 @@ interface CarritoService {
     @POST("usuario/carrito/agregar")
     suspend fun agregarProducto(
         @Body request: AgregarAlCarritoRequest
-    ): Response<CarritoResponse>
+    ): Response<Unit>
     
     /**
      * Actualizar cantidad de producto en el carrito
@@ -26,7 +26,7 @@ interface CarritoService {
     @PUT("usuario/carrito/actualizar")
     suspend fun actualizarCantidad(
         @Body request: ActualizarCantidadRequest
-    ): Response<CarritoResponse>
+    ): Response<Unit>
     
     /**
      * Eliminar producto del carrito
@@ -34,13 +34,13 @@ interface CarritoService {
     @DELETE("usuario/carrito/eliminar/{id}")
     suspend fun eliminarProducto(
         @Path("id") id: Long
-    ): Response<CarritoResponse>
+    ): Response<Unit>
     
     /**
      * Obtener resumen de compra
      */
     @GET("usuario/carrito/resumen")
-    suspend fun obtenerResumen(): Response<ResumenCompraResponse>
+    suspend fun obtenerResumen(): Response<ResumenCompra>
     
     /**
      * Finalizar compra

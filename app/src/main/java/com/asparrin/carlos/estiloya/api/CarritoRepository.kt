@@ -42,9 +42,12 @@ class CarritoRepository(private val carritoService: CarritoService) {
             val response = carritoService.agregarProducto(request)
             
             if (response.isSuccessful) {
-                Result.success(response.body() ?: CarritoResponse(false, "Respuesta vacía"))
+                // El servidor devuelve una respuesta vacía exitosa, recargar el carrito
+                val carritoActual = obtenerCarrito().getOrNull() ?: emptyList()
+                Result.success(CarritoResponse(true, "Producto agregado", carritoActual))
             } else {
-                Result.failure(Exception("Error al agregar producto: ${response.code()}"))
+                val errorBody = response.errorBody()?.string() ?: "Sin detalles"
+                Result.failure(Exception("Error al agregar producto: ${response.code()} - $errorBody"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -76,9 +79,12 @@ class CarritoRepository(private val carritoService: CarritoService) {
             val response = carritoService.actualizarCantidad(request)
             
             if (response.isSuccessful) {
-                Result.success(response.body() ?: CarritoResponse(false, "Respuesta vacía"))
+                // El servidor devuelve una respuesta vacía exitosa, recargar el carrito
+                val carritoActual = obtenerCarrito().getOrNull() ?: emptyList()
+                Result.success(CarritoResponse(true, "Cantidad actualizada", carritoActual))
             } else {
-                Result.failure(Exception("Error al actualizar cantidad: ${response.code()}"))
+                val errorBody = response.errorBody()?.string() ?: "Sin detalles"
+                Result.failure(Exception("Error al actualizar cantidad: ${response.code()} - $errorBody"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -93,9 +99,12 @@ class CarritoRepository(private val carritoService: CarritoService) {
             val response = carritoService.eliminarProducto(itemId)
             
             if (response.isSuccessful) {
-                Result.success(response.body() ?: CarritoResponse(false, "Respuesta vacía"))
+                // El servidor devuelve una respuesta vacía exitosa, recargar el carrito
+                val carritoActual = obtenerCarrito().getOrNull() ?: emptyList()
+                Result.success(CarritoResponse(true, "Producto eliminado", carritoActual))
             } else {
-                Result.failure(Exception("Error al eliminar producto: ${response.code()}"))
+                val errorBody = response.errorBody()?.string() ?: "Sin detalles"
+                Result.failure(Exception("Error al eliminar producto: ${response.code()} - $errorBody"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -129,14 +138,15 @@ class CarritoRepository(private val carritoService: CarritoService) {
             val response = carritoService.obtenerResumen()
             
             if (response.isSuccessful) {
-                val resumenResponse = response.body()
-                if (resumenResponse?.data != null) {
-                    Result.success(resumenResponse.data)
+                val resumen = response.body()
+                if (resumen != null) {
+                    Result.success(resumen)
                 } else {
                     Result.failure(Exception("Resumen no disponible"))
                 }
             } else {
-                Result.failure(Exception("Error al obtener resumen: ${response.code()}"))
+                val errorBody = response.errorBody()?.string() ?: "Sin detalles"
+                Result.failure(Exception("Error al obtener resumen: ${response.code()} - $errorBody"))
             }
         } catch (e: Exception) {
             Result.failure(e)

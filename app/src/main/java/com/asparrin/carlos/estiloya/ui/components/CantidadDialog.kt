@@ -42,7 +42,7 @@ class CantidadDialog(
         val precio = if (producto.descuentoPorcentajeCalculado > 0) {
             producto.precioConDescuento
         } else {
-            producto.precio
+            producto.precio ?: BigDecimal.ZERO
         }
         binding.textPrecio.text = "S/ ${"%.2f".format(precio)}"
         
@@ -74,11 +74,6 @@ class CantidadDialog(
             }
         }
         
-        // Botón cancelar
-        binding.btnCancelar.setOnClickListener {
-            dialog?.dismiss()
-        }
-        
         // Botón agregar
         binding.btnAgregar.setOnClickListener {
             onConfirmar(cantidad)
@@ -96,7 +91,7 @@ class CantidadDialog(
         val precio = if (producto.descuentoPorcentajeCalculado > 0) {
             producto.precioConDescuento
         } else {
-            producto.precio
+            producto.precio ?: BigDecimal.ZERO
         }
         val subtotal = precio.multiply(BigDecimal.valueOf(cantidad.toLong()))
         binding.textSubtotal.text = "Subtotal: S/ ${"%.2f".format(subtotal)}"

@@ -71,6 +71,13 @@ class CarritoActivity : BaseActivity() {
             // Cargar resumen de compra cuando hay items en el carrito
             if (items.isNotEmpty()) {
                 viewModel.cargarResumenCompra(this)
+            } else {
+                // Limpiar resumen si el carrito está vacío
+                binding.textSubtotal.text = "S/ 0.00"
+                binding.textIgv.text = "S/ 0.00"
+                binding.textEnvio.text = "S/ 0.00"
+                binding.textTotal.text = "S/ 0.00"
+                binding.textCantidadItems.text = "0 items"
             }
         }
 
@@ -78,9 +85,12 @@ class CarritoActivity : BaseActivity() {
         viewModel.resumenCompra.observe(this) { resumen ->
             resumen?.data?.let { data ->
                 binding.textSubtotal.text = "S/ ${"%.2f".format(data.subtotal)}"
-                binding.textDescuento.text = "S/ ${"%.2f".format(data.descuento)}"
+                binding.textIgv.text = "S/ ${"%.2f".format(data.igv)}"
+                binding.textEnvio.text = "S/ ${"%.2f".format(data.envio)}"
                 binding.textTotal.text = "S/ ${"%.2f".format(data.total)}"
-                binding.textCantidadItems.text = "${data.cantidadItems} items"
+                // Calcular cantidad de items desde los items del carrito
+                val cantidadItems = viewModel.carritoItems.value?.sumOf { it.cantidad } ?: 0
+                binding.textCantidadItems.text = "$cantidadItems items"
             }
         }
 

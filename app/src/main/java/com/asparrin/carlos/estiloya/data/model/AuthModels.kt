@@ -125,4 +125,11 @@ data class ProfileResponse(
     val success: Boolean = true,
     val message: String,
     val user: Usuario? = null
+)
+
+// Modelo para actualizar datos del usuario (endpoint /me)
+data class UpdateMeRequest(
+    val nombre: String? = null,
+    val apellidos: String? = null,
+    val telefono: String? = null
 ) 

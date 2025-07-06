@@ -172,31 +172,14 @@
                     android:textStyle="bold"/>
             </LinearLayout>
 
-            <!-- Botones de acción -->
-            <LinearLayout
+            <!-- Botón de acción -->
+            <Button
+                android:id="@+id/btnAgregar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="@dimen/margin_large">
-
-                <Button
-                    android:id="@+id/btnAgregar"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/button_height_large"
-                    android:layout_weight="1"
-                    android:text="Agregar al Carrito"
-                    android:textSize="@dimen/text_medium"
-                    android:layout_marginEnd="@dimen/margin_small"/>
-
-                <Button
-                    android:id="@+id/btnComprar"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/button_height_large"
-                    android:layout_weight="1"
-                    android:text="Comprar Ahora"
-                    android:textSize="@dimen/text_medium"
-                    android:layout_marginStart="@dimen/margin_small"/>
-            </LinearLayout>
+                android:layout_height="@dimen/button_height_large"
+                android:text="Agregar al Carrito"
+                android:textSize="@dimen/text_medium"
+                android:layout_marginBottom="@dimen/margin_large"/>
 
         </LinearLayout>
     </ScrollView>

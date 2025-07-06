@@ -129,26 +129,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="end">
-
-        <Button
-            android:id="@+id/btnCancelar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancelar"
-            android:textSize="@dimen/text_medium"
-            android:background="@drawable/bg_button_outline"
-            android:textColor="?android:textColorPrimary"
-            android:layout_marginEnd="@dimen/margin_small"/>
+        android:gravity="center">
 
         <Button
             android:id="@+id/btnAgregar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Agregar al Carrito"
-            android:textSize="@dimen/text_medium"
             android:background="@color/precio_color"
-            android:textColor="@android:color/white"/>
+            android:text="Agregar al Carrito"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_medium" />
 
     </LinearLayout>
 

@@ -3,6 +3,7 @@ package com.asparrin.carlos.estiloya.ui.base
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import com.asparrin.carlos.estiloya.ui.carrito.CarritoActivity
 import com.asparrin.carlos.estiloya.ui.home.HomeActivity
 import com.asparrin.carlos.estiloya.ui.productos.ProductosActivity
 import com.asparrin.carlos.estiloya.ui.disenar.DisenarActivity
+import com.asparrin.carlos.estiloya.ui.perfil.PerfilActivity
 import com.asparrin.carlos.estiloya.utils.SessionManager
 
 abstract class BaseActivity : AppCompatActivity() {
@@ -96,12 +98,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 else R.drawable.ic_productos
             )
         }
-        nb.iconCarrito.apply {
-            setImageResource(
-                if (isDark) R.drawable.ic_cart
-                else R.drawable.ic_cart
-            )
-        }
+
         nb.iconDisenar.apply {
             setImageResource(
                 if (isDark) R.drawable.ic_estilo
@@ -121,12 +118,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 finish()
             }
         }
-        nb.carritoSection.setOnClickListener {
-            if (this !is CarritoActivity) {
-                startActivity(Intent(this@BaseActivity, CarritoActivity::class.java))
-                finish()
-            }
-        }
+
         nb.disenarSection.setOnClickListener {
             if (this !is DisenarActivity) {
                 startActivity(Intent(this@BaseActivity, DisenarActivity::class.java))
@@ -190,10 +182,13 @@ abstract class BaseActivity : AppCompatActivity() {
 
         // Listener para ir a la nueva interfaz de perfil (toda la fila)
         popupBinding.layoutPerfil.setOnClickListener {
+            Log.d("BaseActivity", "Clic en Perfil detectado")
             popupWindow.dismiss()
             if (session.estaLogueado()) {
-                startActivity(Intent(this, com.asparrin.carlos.estiloya.ui.perfil.PerfilUsuarioActivity::class.java))
+                Log.d("BaseActivity", "Usuario logueado, navegando a PerfilActivity")
+                startActivity(Intent(this, com.asparrin.carlos.estiloya.ui.perfil.PerfilActivity::class.java))
             } else {
+                Log.d("BaseActivity", "Usuario no logueado, navegando a LoginActivity")
                 startActivity(Intent(this, LoginActivity::class.java))
             }
         }
