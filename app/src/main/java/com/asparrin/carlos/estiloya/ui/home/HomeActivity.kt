@@ -29,6 +29,7 @@ import com.asparrin.carlos.estiloya.viewModel.AuthState
 import com.asparrin.carlos.estiloya.viewModel.AuthViewModel
 import com.asparrin.carlos.estiloya.viewModel.CarritoViewModel
 import com.asparrin.carlos.estiloya.viewModel.HomeViewModel
+import com.asparrin.carlos.estiloya.utils.SessionManager
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +64,7 @@ class HomeActivity : BaseActivity() {
     
     private lateinit var carritoViewModel: CarritoViewModel
     private lateinit var authViewModel: AuthViewModel
+    private lateinit var sessionManager: SessionManager
     
     companion object {
         private const val TAG = "HomeActivity"
@@ -85,6 +87,10 @@ class HomeActivity : BaseActivity() {
         
         // Inicializar ViewModels
         authViewModel = AuthViewModel(this)
+        sessionManager = SessionManager(this)
+        
+        // Inicializar ViewModel del carrito ANTES de setupObservers
+        carritoViewModel = ViewModelProvider(this)[CarritoViewModel::class.java]
         
         setupBanners()
         setupCategorias()
@@ -92,12 +98,12 @@ class HomeActivity : BaseActivity() {
         setupClickListeners()
         setupObservers()
         
-        // Inicializar ViewModel del carrito
-        carritoViewModel = ViewModelProvider(this)[CarritoViewModel::class.java]
-        
         // Cargar datos
         homeViewModel.cargarTodosLosDatos(this)
         cargarCategorias()
+        
+        // Cargar carrito para actualizar badge
+        carritoViewModel.cargarCarrito(this)
     }
 
     private fun setupBanners() {
@@ -292,7 +298,11 @@ class HomeActivity : BaseActivity() {
             startActivity(intent)
         }
         
-
+        // FAB del carrito
+        binding.fabCarrito.setOnClickListener {
+            val intent = Intent(this, com.asparrin.carlos.estiloya.ui.carrito.CarritoActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupObservers() {
@@ -313,7 +323,19 @@ class HomeActivity : BaseActivity() {
             }
         }
         
-
+        // Observar carrito para actualizar badge
+        carritoViewModel.carritoItems.observe(this) { items ->
+            val totalItems = items.sumOf { it.cantidad }
+            actualizarBadgeCarrito(totalItems)
+        }
+        
+        // Observar mensajes de éxito del carrito
+        carritoViewModel.successMessage.observe(this) { message ->
+            message?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                carritoViewModel.limpiarMensajes()
+            }
+        }
 
         // Observar ofertas del día
         homeViewModel.ofertasDelDia.observe(this) { productos ->
@@ -416,6 +438,20 @@ class HomeActivity : BaseActivity() {
         }
         cantidadDialog.mostrar()
     }
+    
+    /**
+     * Actualizar badge del carrito
+     */
+    private fun actualizarBadgeCarrito(totalItems: Int) {
+        if (totalItems > 0) {
+            binding.badgeCarrito.apply {
+                text = totalItems.toString()
+                visibility = View.VISIBLE
+            }
+        } else {
+            binding.badgeCarrito.visibility = View.GONE
+        }
+    }
 
     private fun navigateToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
@@ -425,10 +461,32 @@ class HomeActivity : BaseActivity() {
     }
     
     private fun navigateToTwoFactor() {
-        val intent = Intent(this, com.asparrin.carlos.estiloya.ui.auth.TwoFactorActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
+        // Obtener información del usuario de la sesión
+        val user = sessionManager.getUser()
+        val correo = user?.correo
+        
+        // Verificar si el usuario tiene correo alternativo configurado
+        val hasAlternativeEmail = !user?.correoAuth.isNullOrEmpty()
+        
+        if (hasAlternativeEmail) {
+            Log.d(TAG, "Usuario tiene correo alternativo configurado, navegando a TwoFactorActivity")
+            val intent = Intent(this, com.asparrin.carlos.estiloya.ui.auth.TwoFactorActivity::class.java)
+            if (correo != null) {
+                intent.putExtra("main_email", correo)
+            }
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        } else {
+            Log.d(TAG, "Usuario no tiene correo alternativo configurado, navegando a AlternativeEmailActivity")
+            val intent = Intent(this, com.asparrin.carlos.estiloya.ui.auth.AlternativeEmailActivity::class.java)
+            if (correo != null) {
+                intent.putExtra("main_email", correo)
+            }
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -460,5 +518,11 @@ class HomeActivity : BaseActivity() {
             }
             .setNegativeButton("No", null)
             .show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Recargar carrito al volver a la pantalla
+        carritoViewModel.cargarCarrito(this)
     }
 }

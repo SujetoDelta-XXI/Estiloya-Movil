@@ -94,7 +94,7 @@ class CarritoViewModel : ViewModel() {
     /**
      * Actualiza la cantidad de un producto en el carrito
      */
-    fun actualizarCantidad(context: Context, itemId: Long, nuevaCantidad: Int) {
+    fun actualizarCantidad(context: Context, productoId: Long, nuevaCantidad: Int) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
@@ -102,7 +102,7 @@ class CarritoViewModel : ViewModel() {
             
             try {
                 val carritoService = ApiClient.createCarritoService(context)
-                val request = ActualizarCantidadRequest(itemId, nuevaCantidad)
+                val request = ActualizarCantidadRequest(productoId, nuevaCantidad)
                 val response = carritoService.actualizarCantidad(request)
                 
                 if (response.isSuccessful) {
@@ -218,6 +218,47 @@ class CarritoViewModel : ViewModel() {
             } catch (e: Exception) {
                 _error.value = "Error de conexión: ${e.message}"
                 Log.e("CarritoViewModel", "Error al finalizar compra", e)
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+    
+    /**
+     * Vacía el carrito completo
+     */
+    fun vaciarCarrito(context: Context) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            _successMessage.value = null
+            
+            try {
+                val carritoService = ApiClient.createCarritoService(context)
+                val items = _carritoItems.value ?: emptyList()
+                
+                // Eliminar todos los items del carrito
+                var todosEliminados = true
+                for (item in items) {
+                    val response = carritoService.eliminarProducto(item.id)
+                    if (!response.isSuccessful) {
+                        todosEliminados = false
+                        break
+                    }
+                }
+                
+                if (todosEliminados) {
+                    _carritoItems.value = emptyList()
+                    _resumenCompra.value = null
+                    _successMessage.value = "Carrito vaciado exitosamente"
+                    Log.d("CarritoViewModel", "Carrito vaciado")
+                } else {
+                    _error.value = "Error al vaciar el carrito"
+                    Log.e("CarritoViewModel", "Error al vaciar carrito")
+                }
+            } catch (e: Exception) {
+                _error.value = "Error de conexión: ${e.message}"
+                Log.e("CarritoViewModel", "Error al vaciar carrito", e)
             } finally {
                 _isLoading.value = false
             }

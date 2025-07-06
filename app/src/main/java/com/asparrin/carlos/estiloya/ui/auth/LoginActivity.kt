@@ -150,27 +150,54 @@ class LoginActivity : AppCompatActivity() {
         val user = loginResponse?.user
         val correo = loginResponse?.correo
         val metodos = loginResponse?.metodos
+        val correoAlternativo = loginResponse?.correoAlternativo
+        val tiene2FAConfigurado = loginResponse?.tiene2FAConfigurado
         
         Log.d(TAG, "=== checkAlternativeEmail DEBUG ===")
         Log.d(TAG, "loginResponse completo: $loginResponse")
         Log.d(TAG, "user: ${user != null}, correo: $correo")
         Log.d(TAG, "metodos: $metodos")
+        Log.d(TAG, "correoAlternativo: $correoAlternativo")
+        Log.d(TAG, "tiene2FAConfigurado: $tiene2FAConfigurado")
         Log.d(TAG, "user?.correoAuth: ${user?.correoAuth}")
+        Log.d(TAG, "user?.correoAuth es null: ${user?.correoAuth == null}")
+        Log.d(TAG, "user?.correoAuth está vacío: ${user?.correoAuth?.isEmpty()}")
         Log.d(TAG, "metodos?.get(\"correo\"): ${metodos?.get("correo")}")
         Log.d(TAG, "metodos?.get(\"sms\"): ${metodos?.get("sms")}")
+        
+        // Verificar si el usuario tiene correo alternativo configurado
+        // Usar los nuevos campos del backend en lugar de user?.correoAuth
+        val hasAlternativeEmail = !correoAlternativo.isNullOrEmpty() || (tiene2FAConfigurado == true)
+        Log.d(TAG, "hasAlternativeEmail calculado: $hasAlternativeEmail")
         Log.d(TAG, "=== FIN DEBUG ===")
         
-        // SOLUCIÓN TEMPORAL: Si requiere 2FA, ir directamente a TwoFactorActivity
-        // El backend manejará el envío del código al email alternativo configurado
-        Log.d(TAG, "DECISIÓN: Requiere 2FA, navegando directamente a TwoFactorActivity")
-        val intent = Intent(this, TwoFactorActivity::class.java)
-        if (correo != null) {
-            intent.putExtra("main_email", correo)
+        if (hasAlternativeEmail) {
+            Log.d(TAG, "✅ Usuario tiene correo alternativo configurado, navegando a TwoFactorActivity")
+            val intent = Intent(this, TwoFactorActivity::class.java)
+            if (correo != null) {
+                intent.putExtra("main_email", correo)
+            }
+            if (user != null) {
+                intent.putExtra("main_email", user.correo)
+            }
+            // Pasar los datos del backend para que TwoFactorActivity los use
+            intent.putExtra("correo_alternativo", correoAlternativo)
+            intent.putExtra("tiene_2fa_configurado", tiene2FAConfigurado ?: false)
+            intent.putExtra("has_email_method", metodos?.get("correo") ?: false)
+            intent.putExtra("has_sms_method", metodos?.get("sms") ?: false)
+            startActivity(intent)
+            finish() // Cerrar LoginActivity para evitar que vuelva atrás
+        } else {
+            Log.d(TAG, "❌ Usuario NO tiene correo alternativo configurado, navegando a AlternativeEmailActivity")
+            val intent = Intent(this, AlternativeEmailActivity::class.java)
+            if (correo != null) {
+                intent.putExtra("main_email", correo)
+            }
+            if (user != null) {
+                intent.putExtra("main_email", user.correo)
+            }
+            startActivity(intent)
+            finish() // Cerrar LoginActivity para evitar que vuelva atrás
         }
-        if (user != null) {
-            intent.putExtra("main_email", user.correo)
-        }
-        startActivity(intent)
-        finish() // Cerrar LoginActivity para evitar que vuelva atrás
     }
 }

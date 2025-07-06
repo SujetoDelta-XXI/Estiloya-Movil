@@ -3,6 +3,8 @@ package com.asparrin.carlos.estiloya.ui.carrito
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
@@ -26,8 +28,9 @@ class CarritoActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         // Asociar el binding al contenido inyectado
-        val contentFrame = findViewById<View>(R.id.content_frame)
-        binding = ActivityCarritoBinding.bind(contentFrame)
+        val contentFrame = findViewById<FrameLayout>(R.id.content_frame)
+        val child = contentFrame.getChildAt(0)
+        binding = ActivityCarritoBinding.bind(child)
 
         setupViewModel()
         setupRecyclerView()
@@ -45,8 +48,8 @@ class CarritoActivity : BaseActivity() {
     private fun setupRecyclerView() {
         adapter = CarritoAdapter(
             items = emptyList(),
-            onCantidadChange = { itemId, cantidad ->
-                viewModel.actualizarCantidad(this, itemId, cantidad)
+            onCantidadChange = { productoId, cantidad ->
+                viewModel.actualizarCantidad(this, productoId, cantidad)
             },
             onEliminar = { itemId ->
                 mostrarDialogoConfirmarEliminacion(itemId)
@@ -64,6 +67,11 @@ class CarritoActivity : BaseActivity() {
         viewModel.carritoItems.observe(this) { items ->
             adapter.updateData(items)
             actualizarEstadoCarrito(items.isEmpty())
+            
+            // Cargar resumen de compra cuando hay items en el carrito
+            if (items.isNotEmpty()) {
+                viewModel.cargarResumenCompra(this)
+            }
         }
 
         // Observar resumen de compra
@@ -94,6 +102,11 @@ class CarritoActivity : BaseActivity() {
             message?.let {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
                 viewModel.limpiarMensajes()
+                
+                // Si es un mensaje de compra finalizada, cerrar la actividad
+                if (it.contains("finalizada")) {
+                    finish()
+                }
             }
         }
     }
@@ -110,6 +123,11 @@ class CarritoActivity : BaseActivity() {
         binding.btnFinalizarCompra.setOnClickListener {
             mostrarDialogoConfirmarCompra()
         }
+        
+        // Botón vaciar carrito
+        binding.btnVaciarCarrito.setOnClickListener {
+            mostrarDialogoVaciarCarrito()
+        }
     }
 
     private fun actualizarEstadoCarrito(estaVacio: Boolean) {
@@ -117,10 +135,12 @@ class CarritoActivity : BaseActivity() {
             binding.layoutCarritoVacio.visibility = View.VISIBLE
             binding.rvCarrito.visibility = View.GONE
             binding.layoutResumen.visibility = View.GONE
+            binding.btnVaciarCarrito.visibility = View.GONE
         } else {
             binding.layoutCarritoVacio.visibility = View.GONE
             binding.rvCarrito.visibility = View.VISIBLE
             binding.layoutResumen.visibility = View.VISIBLE
+            binding.btnVaciarCarrito.visibility = View.VISIBLE
         }
     }
 
@@ -147,6 +167,17 @@ class CarritoActivity : BaseActivity() {
                 .setNegativeButton("Cancelar", null)
                 .show()
         }
+    }
+
+    private fun mostrarDialogoVaciarCarrito() {
+        AlertDialog.Builder(this)
+            .setTitle("Vaciar Carrito")
+            .setMessage("¿Estás seguro de que quieres vaciar el carrito?")
+            .setPositiveButton("Vaciar") { _, _ ->
+                viewModel.vaciarCarrito(this)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     override fun onResume() {

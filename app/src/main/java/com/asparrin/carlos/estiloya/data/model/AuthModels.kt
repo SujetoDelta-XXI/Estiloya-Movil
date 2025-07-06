@@ -25,7 +25,11 @@ data class AuthResponse(
     val requiere2FA: Boolean = false,
     val metodos: Map<String, Boolean>? = null,
     val correo: String? = null,
-    val jwt: String? = null
+    val jwt: String? = null,
+    @SerializedName("correoAlternativo")
+    val correoAlternativo: String? = null,
+    @SerializedName("tiene2FAConfigurado")
+    val tiene2FAConfigurado: Boolean = false
 )
 
 // Modelos para 2FA
@@ -46,7 +50,7 @@ data class SendCodeRequest(
 )
 
 data class SendCodeResponse(
-    val success: Boolean,
+    val success: Boolean = true,
     val message: String
 )
 
@@ -56,9 +60,14 @@ data class RegisterEmailRequest(
 )
 
 data class RegisterEmailResponse(
-    val success: Boolean,
+    @SerializedName("success")
+    val success: Boolean? = null,
+    @SerializedName("message")
     val message: String
-)
+) {
+    val isSuccess: Boolean
+        get() = success != false
+}
 
 // Modelos para recuperación de contraseña
 data class ForgotPasswordRequest(
@@ -66,7 +75,7 @@ data class ForgotPasswordRequest(
 )
 
 data class ForgotPasswordResponse(
-    val success: Boolean,
+    val success: Boolean = true,
     val message: String
 )
 
@@ -77,7 +86,7 @@ data class ResetPasswordRequest(
 )
 
 data class ResetPasswordResponse(
-    val success: Boolean,
+    val success: Boolean = true,
     val message: String
 )
 
@@ -100,7 +109,7 @@ data class GoogleLoginResponse(
 
 // Modelo para prueba de conexión
 data class TestConnectionResponse(
-    val success: Boolean,
+    val success: Boolean = true,
     val message: String,
     val timestamp: String? = null
 )
@@ -113,7 +122,7 @@ data class UpdateProfileRequest(
 )
 
 data class ProfileResponse(
-    val success: Boolean,
+    val success: Boolean = true,
     val message: String,
     val user: Usuario? = null
 ) 

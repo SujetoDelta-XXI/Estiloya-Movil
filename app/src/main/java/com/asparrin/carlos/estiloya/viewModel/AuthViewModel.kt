@@ -213,6 +213,7 @@ class AuthViewModel(private val context: Context) : ViewModel() {
                 authRepository.registerAlternativeEmail(correo, alternativeEmail)
                     .onSuccess { response ->
                         Log.d(TAG, "✅ Email alternativo registrado exitosamente en backend")
+                        Log.d(TAG, "Response: success=${response.isSuccess}, message=${response.message}")
                         _registerEmailResult.value = response
                     }
                     .onFailure { exception ->
@@ -235,7 +236,8 @@ class AuthViewModel(private val context: Context) : ViewModel() {
             
             try {
                 Log.d(TAG, "Intentando enviar código 2FA")
-                authRepository.send2FACode("correo") // El backend maneja el correo alternativo
+                // El backend obtiene la información del usuario del token JWT
+                authRepository.send2FACode() // El backend usa el token para obtener info del usuario
                     .onSuccess { response ->
                         Log.d(TAG, "✅ Código 2FA enviado exitosamente")
                         _sendCodeResult.value = response

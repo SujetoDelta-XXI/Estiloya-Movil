@@ -147,8 +147,15 @@ class TwoFactorActivity : AppCompatActivity() {
                 Log.d(TAG, "Reenviando código 2FA")
                 authViewModel.send2FACode() // Sin parámetros, el backend maneja el correo
             } else {
-                Log.e(TAG, "Error: No se encontró correo alternativo configurado")
-                Toast.makeText(this, "Error: No se encontró correo alternativo configurado.", Toast.LENGTH_LONG).show()
+                Log.d(TAG, "Usuario no tiene correo alternativo configurado, redirigiendo a configuración")
+                Toast.makeText(this, "Configurando correo alternativo para 2FA...", Toast.LENGTH_SHORT).show()
+                
+                // Redirigir a la actividad de configuración de correo alternativo
+                val mainEmail = getUserEmail()
+                val intent = Intent(this, AlternativeEmailActivity::class.java)
+                intent.putExtra("main_email", mainEmail)
+                startActivity(intent)
+                finish()
             }
         }
         
@@ -213,41 +220,48 @@ class TwoFactorActivity : AppCompatActivity() {
     }
 
     private fun hasAlternativeEmail(): Boolean {
+        // Obtener datos del Intent (pasados desde LoginActivity)
+        val correoAlternativo = intent.getStringExtra("correo_alternativo")
+        val tiene2FAConfigurado = intent.getBooleanExtra("tiene_2fa_configurado", false)
+        val hasEmailMethod = intent.getBooleanExtra("has_email_method", false)
+        
         // Verificar si el usuario tiene correo alternativo configurado
-        val user = sessionManager.getUser()
-        val userAlternativeEmail = user?.correoAuth
+        val hasEmail = !correoAlternativo.isNullOrEmpty() || tiene2FAConfigurado || hasEmailMethod
         
-        val loginResult = authViewModel.loginResult.value
-        val loginAlternativeEmail = loginResult?.user?.correoAuth
-        
-        val hasEmail = !userAlternativeEmail.isNullOrEmpty() || !loginAlternativeEmail.isNullOrEmpty()
-        Log.d(TAG, "hasAlternativeEmail - user email: $userAlternativeEmail, login email: $loginAlternativeEmail, hasEmail: $hasEmail")
+        Log.d(TAG, "hasAlternativeEmail - correoAlternativo: $correoAlternativo, tiene2FAConfigurado: $tiene2FAConfigurado, hasEmailMethod: $hasEmailMethod, hasEmail: $hasEmail")
         
         return hasEmail
     }
     
     private fun getUserAlternativeEmail(): String? {
-        // Intentar obtener email alternativo del usuario guardado en sesión
+        // Obtener email alternativo del Intent (pasado desde LoginActivity)
+        val correoAlternativo = intent.getStringExtra("correo_alternativo")
+        
+        if (!correoAlternativo.isNullOrEmpty()) {
+            Log.d(TAG, "getUserAlternativeEmail - correoAlternativo del intent: $correoAlternativo")
+            return correoAlternativo
+        }
+        
+        // Fallback: intentar obtener email alternativo del usuario guardado en sesión
         val user = sessionManager.getUser()
         val alternativeEmail = user?.correoAuth
         
-        // Si no hay usuario guardado, intentar obtener del resultado del login
-        if (alternativeEmail == null) {
-            val loginResult = authViewModel.loginResult.value
-            val emailFromLogin = loginResult?.user?.correoAuth
-            
-            // Si tampoco hay en el login, intentar obtener del almacenamiento local
-            if (emailFromLogin == null) {
-                val sharedPreferences = getSharedPreferences("EstiloyaSession", MODE_PRIVATE)
-                val localEmail = sharedPreferences.getString("alternative_email", null)
-                Log.d(TAG, "getUserAlternativeEmail - local email: $localEmail")
-                return localEmail
-            }
-            
-            return emailFromLogin
+        if (!alternativeEmail.isNullOrEmpty()) {
+            Log.d(TAG, "getUserAlternativeEmail - correoAuth del usuario en sesión: $alternativeEmail")
+            return alternativeEmail
         }
         
-        return alternativeEmail
+        // Fallback: intentar obtener del almacenamiento local
+        val sharedPreferences = getSharedPreferences("EstiloyaSession", MODE_PRIVATE)
+        val localEmail = sharedPreferences.getString("alternative_email", null)
+        
+        if (!localEmail.isNullOrEmpty()) {
+            Log.d(TAG, "getUserAlternativeEmail - email local: $localEmail")
+            return localEmail
+        }
+        
+        Log.d(TAG, "getUserAlternativeEmail - no se encontró email alternativo")
+        return null
     }
     
     private fun sendInitialCode() {
@@ -274,9 +288,21 @@ class TwoFactorActivity : AppCompatActivity() {
             }
         }
         
-        // SOLUCIÓN TEMPORAL: Si requiere 2FA, siempre enviar código
-        // El backend manejará el envío al email alternativo configurado
-        Log.d(TAG, "Enviando código 2FA automáticamente")
+        // Verificar si el usuario tiene correo alternativo configurado
+        if (!hasAlternativeEmail()) {
+            Log.d(TAG, "Usuario no tiene correo alternativo configurado, redirigiendo a configuración")
+            Toast.makeText(this, "Configurando correo alternativo para 2FA...", Toast.LENGTH_SHORT).show()
+            
+            // Redirigir a la actividad de configuración de correo alternativo
+            val intent = Intent(this, AlternativeEmailActivity::class.java)
+            intent.putExtra("main_email", mainEmail)
+            startActivity(intent)
+            finish()
+            return
+        }
+        
+        // Si tiene correo alternativo, enviar código 2FA
+        Log.d(TAG, "Usuario tiene correo alternativo configurado, enviando código 2FA")
         Toast.makeText(this, "Enviando código de verificación...", Toast.LENGTH_SHORT).show()
         authViewModel.send2FACode() // Sin parámetros, el backend maneja el correo
     }
@@ -311,12 +337,17 @@ class TwoFactorActivity : AppCompatActivity() {
     
     private fun updateEmailText() {
         val mainEmail = getUserEmail()
-        val hasSms = intent.getBooleanExtra("has_sms", false)
-        val hasEmail = intent.getBooleanExtra("has_email", false)
+        val alternativeEmail = getUserAlternativeEmail()
+        val hasSms = intent.getBooleanExtra("has_sms_method", false)
+        val hasEmail = intent.getBooleanExtra("has_email_method", false)
         
-        // SOLUCIÓN TEMPORAL: Mostrar mensaje genérico
-        binding.emailText.text = "Código enviado a tu correo alternativo"
+        // Mostrar el correo alternativo real si está disponible
+        if (!alternativeEmail.isNullOrEmpty()) {
+            binding.emailText.text = "Código enviado a: $alternativeEmail"
+        } else {
+            binding.emailText.text = "Código enviado a tu correo alternativo"
+        }
         
-        Log.d(TAG, "updateEmailText - hasAlternativeEmail: ${hasAlternativeEmail()}, hasSms: $hasSms, hasEmail: $hasEmail")
+        Log.d(TAG, "updateEmailText - hasAlternativeEmail: ${hasAlternativeEmail()}, hasSms: $hasSms, hasEmail: $hasEmail, alternativeEmail: $alternativeEmail")
     }
 } 

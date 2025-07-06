@@ -16,6 +16,7 @@ import com.asparrin.carlos.estiloya.databinding.ComponentHeaderBinding
 import com.asparrin.carlos.estiloya.databinding.ComponentNavBinding
 import com.asparrin.carlos.estiloya.databinding.PopupUsuarioBinding
 import com.asparrin.carlos.estiloya.ui.auth.LoginActivity
+import com.asparrin.carlos.estiloya.ui.carrito.CarritoActivity
 import com.asparrin.carlos.estiloya.ui.home.HomeActivity
 import com.asparrin.carlos.estiloya.ui.productos.ProductosActivity
 import com.asparrin.carlos.estiloya.ui.disenar.DisenarActivity
@@ -95,6 +96,12 @@ abstract class BaseActivity : AppCompatActivity() {
                 else R.drawable.ic_productos
             )
         }
+        nb.iconCarrito.apply {
+            setImageResource(
+                if (isDark) R.drawable.ic_cart
+                else R.drawable.ic_cart
+            )
+        }
         nb.iconDisenar.apply {
             setImageResource(
                 if (isDark) R.drawable.ic_estilo
@@ -111,6 +118,12 @@ abstract class BaseActivity : AppCompatActivity() {
         nb.productosSection.setOnClickListener {
             if (this !is ProductosActivity) {
                 startActivity(Intent(this@BaseActivity, ProductosActivity::class.java))
+                finish()
+            }
+        }
+        nb.carritoSection.setOnClickListener {
+            if (this !is CarritoActivity) {
+                startActivity(Intent(this@BaseActivity, CarritoActivity::class.java))
                 finish()
             }
         }

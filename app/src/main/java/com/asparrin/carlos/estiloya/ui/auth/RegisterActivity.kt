@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.asparrin.carlos.estiloya.databinding.ActivityRegisterBinding
-import com.asparrin.carlos.estiloya.ui.home.HomeActivity
 import com.asparrin.carlos.estiloya.viewModel.AuthState
 import com.asparrin.carlos.estiloya.viewModel.AuthViewModel
 
@@ -37,12 +36,12 @@ class RegisterActivity : AppCompatActivity() {
         authViewModel.authState.observe(this) { state ->
             when (state) {
                 AuthState.AUTHENTICATED -> {
-                    Log.d(TAG, "Usuario registrado y autenticado, navegando a Home")
-                    navigateToHome()
+                    Log.d(TAG, "Usuario registrado exitosamente, navegando a Login")
+                    navigateToLogin()
                 }
                 AuthState.REQUIRES_2FA -> {
-                    Log.d(TAG, "Registro requiere 2FA, navegando a TwoFactorActivity")
-                    navigateToTwoFactor()
+                    Log.d(TAG, "Registro requiere 2FA, navegando a Login")
+                    navigateToLogin()
                 }
                 AuthState.NOT_AUTHENTICATED -> {
                     Log.d(TAG, "Usuario no autenticado")
@@ -70,11 +69,11 @@ class RegisterActivity : AppCompatActivity() {
         // Observar resultado de registro
         authViewModel.registerResult.observe(this) { response ->
             if (response.success) {
-                if (response.requiere2FA) {
-                    Toast.makeText(this, "Registro exitoso. Se requiere verificación 2FA", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
-                }
+                Toast.makeText(this, "Registro exitoso. Por favor inicia sesión", Toast.LENGTH_SHORT).show()
+                // Navegar a Login después de un breve delay para que se vea el mensaje
+                binding.root.postDelayed({
+                    navigateToLogin()
+                }, 1500)
             } else {
                 val message = response.message ?: "Error desconocido en el registro"
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show()
@@ -146,16 +145,8 @@ class RegisterActivity : AppCompatActivity() {
         return true
     }
     
-    private fun navigateToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
-    }
-    
-    private fun navigateToTwoFactor() {
-        val intent = Intent(this, TwoFactorActivity::class.java)
-        startActivity(intent)
+    private fun navigateToLogin() {
+        startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
 }

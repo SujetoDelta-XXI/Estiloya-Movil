@@ -21,6 +21,7 @@ import com.asparrin.carlos.estiloya.ui.base.BaseActivity
 import com.asparrin.carlos.estiloya.ui.components.CantidadDialog
 import androidx.lifecycle.ViewModelProvider
 import com.asparrin.carlos.estiloya.viewModel.CarritoViewModel
+import com.asparrin.carlos.estiloya.viewModel.ProductosViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,8 +50,9 @@ class ProductosActivity : BaseActivity() {
         ApiClient.createCategoriaService(this)
     }
     
-    // ViewModel del carrito
+    // ViewModels
     private lateinit var carritoViewModel: CarritoViewModel
+    private lateinit var productosViewModel: ProductosViewModel
 
     override fun getLayoutResourceId(): Int = R.layout.activity_productos
 
@@ -62,6 +64,10 @@ class ProductosActivity : BaseActivity() {
         val child = contentFrame.getChildAt(0)
         binding = ActivityProductosBinding.bind(child)
 
+        // Inicializar ViewModels
+        carritoViewModel = ViewModelProvider(this)[CarritoViewModel::class.java]
+        productosViewModel = ViewModelProvider(this)[ProductosViewModel::class.java]
+
         setupRecyclerView()
         setupBuscador()
         setupFiltrosDesplegables()
@@ -70,8 +76,14 @@ class ProductosActivity : BaseActivity() {
         cargarCategorias()
         fetchProductosFromApi()
         
-        // Inicializar ViewModel del carrito
-        carritoViewModel = ViewModelProvider(this)[CarritoViewModel::class.java]
+        setupClickListeners()
+        setupObservers()
+        
+        // Cargar productos
+        productosViewModel.cargarProductos(this)
+        
+        // Cargar carrito para actualizar badge
+        carritoViewModel.cargarCarrito(this)
     }
 
     private fun procesarParametrosEntrada() {
@@ -169,42 +181,11 @@ class ProductosActivity : BaseActivity() {
     }
 
     private fun setupFiltrosDesplegables() {
-        // Configurar botón para mostrar/ocultar filtros
-        binding.btnMostrarFiltros.setOnClickListener {
-            togglePanelFiltros()
-        }
-
         // Configurar spinner de tipos inmediatamente
         val tipos = listOf(getString(R.string.filter_all_types), "Polo", "Polera")
         val adapterTipo = ArrayAdapter(this, R.layout.spinner_item_filter, tipos)
         adapterTipo.setDropDownViewResource(R.layout.spinner_dropdown_item_filter)
         binding.spinnerTipo.adapter = adapterTipo
-
-        // Configurar botón de aplicar filtros - ÚNICO lugar donde se aplican filtros manualmente
-        binding.btnAplicarFiltros.setOnClickListener {
-            aplicarFiltros()
-        }
-
-        // Configurar botón de limpiar filtros
-        binding.btnLimpiarFiltros.setOnClickListener {
-            limpiarFiltros()
-        }
-    }
-
-    private fun togglePanelFiltros() {
-        if (binding.panelFiltros.visibility == View.VISIBLE) {
-            binding.panelFiltros.visibility = View.GONE
-            binding.btnMostrarFiltros.text = getString(R.string.filter_show)
-        } else {
-            binding.panelFiltros.visibility = View.VISIBLE
-            binding.btnMostrarFiltros.text = getString(R.string.filter_hide)
-            
-            // Actualizar estado visual de los CheckBox cuando se muestra el panel
-            binding.checkMenos50.isChecked = filtroMenos50Activo
-            binding.checkPocasUnidades.isChecked = filtroPocasUnidadesActivo
-            binding.checkOferta.isChecked = filtroOfertaActivo
-            binding.checkNuevos.isChecked = filtroNuevosActivo
-        }
     }
 
     private fun cargarCategorias() {
@@ -459,5 +440,98 @@ class ProductosActivity : BaseActivity() {
             carritoViewModel.agregarProducto(this, producto.id, cantidad)
         }
         cantidadDialog.mostrar()
+    }
+    
+    /**
+     * Actualizar badge del carrito
+     */
+    private fun actualizarBadgeCarrito(totalItems: Int) {
+        if (totalItems > 0) {
+            binding.badgeCarrito.apply {
+                text = totalItems.toString()
+                visibility = View.VISIBLE
+            }
+        } else {
+            binding.badgeCarrito.visibility = View.GONE
+        }
+    }
+
+    private fun setupClickListeners() {
+        // Botón mostrar/ocultar filtros
+        binding.btnMostrarFiltros.setOnClickListener {
+            toggleFiltros()
+        }
+
+        // Botón aplicar filtros
+        binding.btnAplicarFiltros.setOnClickListener {
+            aplicarFiltros()
+        }
+
+        // Botón limpiar filtros
+        binding.btnLimpiarFiltros.setOnClickListener {
+            limpiarFiltros()
+        }
+        
+        // FAB del carrito
+        binding.fabCarrito.setOnClickListener {
+            val intent = Intent(this, com.asparrin.carlos.estiloya.ui.carrito.CarritoActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun toggleFiltros() {
+        if (binding.panelFiltros.visibility == View.VISIBLE) {
+            binding.panelFiltros.visibility = View.GONE
+            binding.btnMostrarFiltros.text = getString(R.string.filter_show)
+        } else {
+            binding.panelFiltros.visibility = View.VISIBLE
+            binding.btnMostrarFiltros.text = getString(R.string.filter_hide)
+            
+            // Actualizar estado visual de los CheckBox cuando se muestra el panel
+            binding.checkMenos50.isChecked = filtroMenos50Activo
+            binding.checkPocasUnidades.isChecked = filtroPocasUnidadesActivo
+            binding.checkOferta.isChecked = filtroOfertaActivo
+            binding.checkNuevos.isChecked = filtroNuevosActivo
+        }
+    }
+
+    private fun setupObservers() {
+        // Observar productos
+        productosViewModel.productos.observe(this) { productos ->
+            productosOriginales = productos
+            aplicarFiltros()
+        }
+
+        // Observar estado de carga
+        productosViewModel.isLoading.observe(this) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        // Observar errores
+        productosViewModel.error.observe(this) { error ->
+            error?.let {
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            }
+        }
+        
+        // Observar carrito para actualizar badge
+        carritoViewModel.carritoItems.observe(this) { items ->
+            val totalItems = items.sumOf { it.cantidad }
+            actualizarBadgeCarrito(totalItems)
+        }
+        
+        // Observar mensajes de éxito del carrito
+        carritoViewModel.successMessage.observe(this) { message ->
+            message?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                carritoViewModel.limpiarMensajes()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Recargar carrito al volver a la pantalla
+        carritoViewModel.cargarCarrito(this)
     }
 }

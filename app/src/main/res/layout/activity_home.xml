@@ -384,4 +384,34 @@
         </ScrollView>
     </LinearLayout>
 
+    <!-- Floating Action Button del Carrito -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabCarrito"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/margin_large"
+        android:src="@drawable/ic_cart"
+        android:contentDescription="Carrito de compras"
+        app:fabSize="normal"
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/precio_color"
+        app:elevation="6dp"/>
+
+    <!-- Badge del carrito (contador) -->
+    <TextView
+        android:id="@+id/badgeCarrito"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/margin_large"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:background="@drawable/bg_circle_accent"
+        android:text="0"
+        android:textSize="12sp"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:visibility="gone"/>
+
 </FrameLayout> 

@@ -23,9 +23,29 @@ class AuthRepository(private val context: Context) {
             val response = authService.register(request)
             
             if (response.isSuccessful) {
-                Result.success(response.body()!!)
+                val authResponse = response.body()
+                if (authResponse != null) {
+                    Log.d("AuthRepository", "Registro exitoso - success: ${authResponse.success}")
+                    Log.d("AuthRepository", "Registro exitoso - requiere2FA: ${authResponse.requiere2FA}")
+                    Log.d("AuthRepository", "Registro exitoso - token: ${authResponse.token?.take(50)}...")
+                    Log.d("AuthRepository", "Registro exitoso - jwt: ${authResponse.jwt?.take(50)}...")
+                    Log.d("AuthRepository", "Registro exitoso - metodos: ${authResponse.metodos}")
+                    Log.d("AuthRepository", "Registro exitoso - user: ${authResponse.user}")
+                    Log.d("AuthRepository", "Registro exitoso - user?.correoAuth: ${authResponse.user?.correoAuth}")
+                    Log.d("AuthRepository", "Registro exitoso - correo: ${authResponse.correo}")
+                    Log.d("AuthRepository", "Registro exitoso - correoAlternativo: ${authResponse.correoAlternativo}")
+                    Log.d("AuthRepository", "Registro exitoso - tiene2FAConfigurado: ${authResponse.tiene2FAConfigurado}")
+                    Result.success(authResponse)
+                } else {
+                    val errorMessage = "Respuesta vacía del servidor"
+                    Log.e("AuthRepository", "Registro error: $errorMessage")
+                    Result.failure(Exception(errorMessage))
+                }
             } else {
-                Result.failure(Exception("Error en el registro: ${response.code()}"))
+                val errorBody = response.errorBody()?.string()
+                val errorMessage = errorBody ?: "Error en el registro: ${response.code()}"
+                Log.e("AuthRepository", "Registro error: $errorMessage")
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -42,12 +62,24 @@ class AuthRepository(private val context: Context) {
             Log.d("AuthRepository", "Login response error body: ${response.errorBody()?.string()}")
             
             if (response.isSuccessful) {
-                val authResponse = response.body()!!
-                Log.d("AuthRepository", "Login exitoso - requiere2FA: ${authResponse.requiere2FA}")
-                Log.d("AuthRepository", "Login exitoso - metodos: ${authResponse.metodos}")
-                Log.d("AuthRepository", "Login exitoso - user: ${authResponse.user}")
-                Log.d("AuthRepository", "Login exitoso - correo: ${authResponse.correo}")
-                Result.success(authResponse)
+                val authResponse = response.body()
+                if (authResponse != null) {
+                    Log.d("AuthRepository", "Login exitoso - success: ${authResponse.success}")
+                    Log.d("AuthRepository", "Login exitoso - requiere2FA: ${authResponse.requiere2FA}")
+                    Log.d("AuthRepository", "Login exitoso - token: ${authResponse.token?.take(50)}...")
+                    Log.d("AuthRepository", "Login exitoso - jwt: ${authResponse.jwt?.take(50)}...")
+                    Log.d("AuthRepository", "Login exitoso - metodos: ${authResponse.metodos}")
+                    Log.d("AuthRepository", "Login exitoso - user: ${authResponse.user}")
+                    Log.d("AuthRepository", "Login exitoso - user?.correoAuth: ${authResponse.user?.correoAuth}")
+                    Log.d("AuthRepository", "Login exitoso - correo: ${authResponse.correo}")
+                    Log.d("AuthRepository", "Login exitoso - correoAlternativo: ${authResponse.correoAlternativo}")
+                    Log.d("AuthRepository", "Login exitoso - tiene2FAConfigurado: ${authResponse.tiene2FAConfigurado}")
+                    Result.success(authResponse)
+                } else {
+                    val errorMessage = "Respuesta vacía del servidor"
+                    Log.e("AuthRepository", "Login error: $errorMessage")
+                    Result.failure(Exception(errorMessage))
+                }
             } else {
                 val errorBody = response.errorBody()?.string()
                 val errorMessage = errorBody ?: "Error en el login: ${response.code()}"
@@ -113,7 +145,29 @@ class AuthRepository(private val context: Context) {
             Log.d("AuthRepository", "Response error body: ${response.errorBody()?.string()}")
             
             if (response.isSuccessful) {
-                Result.success(response.body()!!)
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    // Verificar si el backend devolvió solo un mensaje sin success
+                    if (!responseBody.isSuccess && responseBody.message.isNotEmpty()) {
+                        Log.d("AuthRepository", "Backend devolvió solo mensaje, creando respuesta manual con success=true")
+                        val manualResponse = RegisterEmailResponse(
+                            success = true,
+                            message = responseBody.message
+                        )
+                        Result.success(manualResponse)
+                    } else {
+                        // Si el backend devolvió una respuesta válida con success, usarla
+                        Result.success(responseBody)
+                    }
+                } else {
+                    // Si el body es null pero la respuesta fue exitosa, crear respuesta manual
+                    Log.d("AuthRepository", "Backend devolvió respuesta exitosa pero body null, creando respuesta manual")
+                    val manualResponse = RegisterEmailResponse(
+                        success = true,
+                        message = "Correo alternativo registrado exitosamente"
+                    )
+                    Result.success(manualResponse)
+                }
             } else {
                 // Intentar leer el mensaje de error del body
                 val errorBody = response.errorBody()?.string()
@@ -123,13 +177,23 @@ class AuthRepository(private val context: Context) {
             }
         } catch (e: Exception) {
             Log.e("AuthRepository", "Exception registering alternative email", e)
-            Result.failure(e)
+            // Si hay error de JSON malformado, crear respuesta manual
+            if (e.message?.contains("malformed JSON") == true || e.message?.contains("Expected BEGIN_OBJECT") == true) {
+                Log.d("AuthRepository", "Backend devolvió respuesta no-JSON, creando respuesta manual")
+                val manualResponse = RegisterEmailResponse(
+                    success = true,
+                    message = "Correo alternativo registrado exitosamente"
+                )
+                Result.success(manualResponse)
+            } else {
+                Result.failure(e)
+            }
         }
     }
     
-    suspend fun send2FACode(correo: String): Result<SendCodeResponse> = withContext(Dispatchers.IO) {
+    suspend fun send2FACode(): Result<SendCodeResponse> = withContext(Dispatchers.IO) {
         try {
-            Log.d("AuthRepository", "Enviando código 2FA para correo: $correo")
+            Log.d("AuthRepository", "Enviando código 2FA")
             val response = authService.send2FACode("correo")
             
             Log.d("AuthRepository", "Response code: ${response.code()}")

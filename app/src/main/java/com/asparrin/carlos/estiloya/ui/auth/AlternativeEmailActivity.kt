@@ -47,25 +47,45 @@ class AlternativeEmailActivity : AppCompatActivity() {
 
         // Observar resultado del registro de email alternativo
         authViewModel.registerEmailResult.observe(this) { response ->
-            if (response.success) {
+            Log.d(TAG, "📧 RegisterEmailResult recibido: success=${response.isSuccess}, message=${response.message}")
+            
+            if (response.isSuccess) {
                 Toast.makeText(this, "Correo alternativo registrado exitosamente", Toast.LENGTH_LONG).show()
                 
                 // Navegar directamente a la actividad de 2FA
-                Log.d(TAG, "Correo alternativo registrado, navegando a 2FA")
+                Log.d(TAG, "🚀 Iniciando navegación a TwoFactorActivity")
                 val intent = Intent(this, TwoFactorActivity::class.java)
+                
+                // Obtener el main_email del intent original que inició esta actividad
+                val mainEmail = this.intent.getStringExtra("main_email")
+                Log.d(TAG, "📧 Main email para pasar a TwoFactorActivity: $mainEmail")
+                if (!mainEmail.isNullOrEmpty()) {
+                    intent.putExtra("main_email", mainEmail)
+                    Log.d(TAG, "✅ Main email agregado al intent")
+                } else {
+                    Log.w(TAG, "⚠️ Main email no encontrado en el intent")
+                }
+                
+                // Pasar el correo alternativo que se acaba de registrar
+                val alternativeEmail = binding.alternativeEmailEditText.text.toString().trim()
+                if (!alternativeEmail.isEmpty()) {
+                    intent.putExtra("correo_alternativo", alternativeEmail)
+                    intent.putExtra("tiene_2fa_configurado", true)
+                    intent.putExtra("has_email_method", true)
+                    intent.putExtra("has_sms_method", false)
+                    Log.d(TAG, "✅ Correo alternativo agregado al intent: $alternativeEmail")
+                }
+                
+                Log.d(TAG, "🚀 Iniciando TwoFactorActivity...")
                 startActivity(intent)
+                Log.d(TAG, "✅ TwoFactorActivity iniciada, finalizando AlternativeEmailActivity")
                 finish()
             } else {
                 val message = response.message ?: "Error desconocido al registrar correo alternativo"
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show()
                 
-                // TEMPORAL: Si falla el registro, navegar de todas formas a 2FA
-                // para que el backend maneje la configuración
-                Log.d(TAG, "Error en registro de email alternativo, navegando a 2FA de todas formas")
-                Toast.makeText(this, "Navegando a verificación 2FA...", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, TwoFactorActivity::class.java)
-                startActivity(intent)
-                finish()
+                // Si falla el registro, el usuario debe intentar de nuevo
+                Log.e(TAG, "❌ Error en registro de email alternativo: $message")
             }
         }
     }
@@ -76,8 +96,9 @@ class AlternativeEmailActivity : AppCompatActivity() {
             
             if (validateEmail(alternativeEmail)) {
                 Log.d(TAG, "Registrando correo alternativo: $alternativeEmail")
-                // Obtener el correo principal del SessionManager o del intent
-                val mainEmail = intent.getStringExtra("main_email") ?: ""
+                // Obtener el correo principal del intent original que inició esta actividad
+                val mainEmail = this.intent.getStringExtra("main_email") ?: ""
+                Log.d(TAG, "Main email obtenido del intent: $mainEmail")
                 
                 // Guardar el correo alternativo localmente para uso temporal
                 saveAlternativeEmailLocally(alternativeEmail)

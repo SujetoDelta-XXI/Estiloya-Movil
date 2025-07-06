@@ -23,8 +23,8 @@ data class AgregarAlCarritoRequest(
 
 // Modelo para actualizar cantidad en carrito
 data class ActualizarCantidadRequest(
-    @SerializedName("itemId")
-    val itemId: Long,
+    @SerializedName("productoId")
+    val productoId: Long,
     val cantidad: Int
 )
 

@@ -1,306 +1,343 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="@dimen/padding_medium"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Título de la pantalla -->
-    <TextView
-        android:id="@+id/tvProductosTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Productos"
-        android:textSize="@dimen/text_title"
-        android:textStyle="bold"
-        android:textColor="@color/text"
-        android:gravity="center"
-        android:layout_marginBottom="@dimen/margin_medium"/>
-
-    <!-- Buscador -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/bg_search_input"
-        android:padding="@dimen/padding_small"
-        android:layout_marginBottom="@dimen/margin_medium">
-
-        <EditText
-            android:id="@+id/etBuscarProducto"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:hint="Buscar productos por nombre..."
-            android:background="@null"
-            android:paddingStart="@dimen/padding_medium"
-            android:paddingEnd="@dimen/padding_medium"
-            android:textSize="@dimen/text_small"
-            android:inputType="text"
-            android:imeOptions="actionSearch"
-            android:maxLines="1"
-            android:singleLine="true" />
-
-        <ImageButton
-            android:id="@+id/btnBuscarProducto"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_search"
-            android:background="?selectableItemBackgroundBorderless"
-            android:contentDescription="Buscar"
-            android:tint="@color/primary" />
-
-    </LinearLayout>
-
-    <!-- Botón para abrir filtros -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="@dimen/margin_medium">
-
-        <Button
-            android:id="@+id/btnMostrarFiltros"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/button_height"
-            android:layout_weight="1"
-            android:text="@string/filter_show"
-            android:textSize="@dimen/text_medium"
-            android:backgroundTint="@color/primary"
-            android:textColor="@color/onPrimary"
-            android:drawableStart="@drawable/ic_search"
-            android:drawablePadding="@dimen/padding_small" />
-
-    </LinearLayout>
-
-    <!-- Panel de filtros (inicialmente oculto) -->
-    <LinearLayout
-        android:id="@+id/panelFiltros"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@drawable/bg_filter_container"
         android:padding="@dimen/padding_medium"
-        android:layout_marginBottom="@dimen/margin_medium"
-        android:visibility="gone">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <!-- Rango de precio -->
+        <!-- Título de la pantalla -->
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvProductosTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/filter_price_range"
-            style="@style/FilterTitle"/>
+            android:text="Productos"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold"
+            android:textColor="@color/text"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/margin_medium"/>
 
+        <!-- Buscador -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:background="@drawable/bg_search_input"
+            android:padding="@dimen/padding_small"
             android:layout_marginBottom="@dimen/margin_medium">
 
             <EditText
-                android:id="@+id/etPrecioMin"
+                android:id="@+id/etBuscarProducto"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/button_height"
+                android:layout_height="40dp"
                 android:layout_weight="1"
-                android:hint="@string/filter_price_min_hint"
-                android:inputType="numberDecimal"
+                android:hint="Buscar productos por nombre..."
+                android:background="@null"
+                android:paddingStart="@dimen/padding_medium"
+                android:paddingEnd="@dimen/padding_medium"
                 android:textSize="@dimen/text_small"
-                android:padding="@dimen/padding_small"
-                android:layout_marginEnd="@dimen/margin_small"
-                android:background="@drawable/bg_filter_input"
-                android:textColor="@color/filter_text"
-                android:textColorHint="@color/filter_hint"/>
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:maxLines="1"
+                android:singleLine="true" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="-"
-                android:textSize="@dimen/text_medium"
-                android:textColor="@color/filter_text"
-                android:layout_marginHorizontal="@dimen/margin_small"/>
+            <ImageButton
+                android:id="@+id/btnBuscarProducto"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_search"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="Buscar"
+                android:tint="@color/primary" />
 
-            <EditText
-                android:id="@+id/etPrecioMax"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/button_height"
-                android:layout_weight="1"
-                android:hint="@string/filter_price_max_hint"
-                android:inputType="numberDecimal"
-                android:textSize="@dimen/text_small"
-                android:padding="@dimen/padding_small"
-                android:layout_marginStart="@dimen/margin_small"
-                android:background="@drawable/bg_filter_input"
-                android:textColor="@color/filter_text"
-                android:textColorHint="@color/filter_hint"/>
         </LinearLayout>
 
-        <!-- Categoría y Tipo en la misma fila -->
+        <!-- Botón para abrir filtros -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="@dimen/margin_medium">
-
-            <!-- Categoría -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginEnd="@dimen/margin_small">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/filter_category"
-                    style="@style/FilterTitle"/>
-
-                <Spinner
-                    android:id="@+id/spinnerCategoria"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/button_height"
-                    android:background="@drawable/bg_filter_input"
-                    android:popupBackground="@color/filter_background"/>
-
-            </LinearLayout>
-
-            <!-- Tipo -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginStart="@dimen/margin_small">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/filter_type"
-                    style="@style/FilterTitle"/>
-
-                <Spinner
-                    android:id="@+id/spinnerTipo"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/button_height"
-                    android:background="@drawable/bg_filter_input"
-                    android:popupBackground="@color/filter_background"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- Filtros de botones circulares -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="@dimen/margin_medium">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/filter_rapid_filters"
-                style="@style/FilterTitle"/>
-
-            <GridLayout
-                android:id="@+id/layoutFiltrosRapidos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:rowCount="2"
-                android:useDefaultMargins="true"
-                android:layout_marginTop="@dimen/margin_small">
-
-                <CheckBox
-                    android:id="@+id/checkMenos50"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:text="@string/filter_less_than_50"/>
-
-                <CheckBox
-                    android:id="@+id/checkPocasUnidades"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:text="@string/filter_last_units"/>
-
-                <CheckBox
-                    android:id="@+id/checkOferta"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:text="@string/filter_offer"/>
-
-                <CheckBox
-                    android:id="@+id/checkNuevos"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:text="@string/filter_new"/>
-
-            </GridLayout>
-
-        </LinearLayout>
-
-        <!-- Botones de acción -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="@dimen/margin_medium">
 
             <Button
-                android:id="@+id/btnAplicarFiltros"
+                android:id="@+id/btnMostrarFiltros"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/button_height"
                 android:layout_weight="1"
-                android:text="@string/filter_apply"
+                android:text="@string/filter_show"
                 android:textSize="@dimen/text_medium"
                 android:backgroundTint="@color/primary"
                 android:textColor="@color/onPrimary"
-                android:layout_marginEnd="@dimen/margin_small" />
-
-            <Button
-                android:id="@+id/btnLimpiarFiltros"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/button_height"
-                android:layout_weight="1"
-                android:text="@string/filter_clear"
-                android:textSize="@dimen/text_medium"
-                android:backgroundTint="@color/surface"
-                android:textColor="@color/text"
-                android:layout_marginStart="@dimen/margin_small" />
+                android:drawableStart="@drawable/ic_search"
+                android:drawablePadding="@dimen/padding_small" />
 
         </LinearLayout>
 
+        <!-- Panel de filtros (inicialmente oculto) -->
+        <LinearLayout
+            android:id="@+id/panelFiltros"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_filter_container"
+            android:padding="@dimen/padding_medium"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:visibility="gone">
+
+            <!-- Rango de precio -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_price_range"
+                style="@style/FilterTitle"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="@dimen/margin_medium">
+
+                <EditText
+                    android:id="@+id/etPrecioMin"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_weight="1"
+                    android:hint="@string/filter_price_min_hint"
+                    android:inputType="numberDecimal"
+                    android:textSize="@dimen/text_small"
+                    android:padding="@dimen/padding_small"
+                    android:layout_marginEnd="@dimen/margin_small"
+                    android:background="@drawable/bg_filter_input"
+                    android:textColor="@color/filter_text"
+                    android:textColorHint="@color/filter_hint"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textSize="@dimen/text_medium"
+                    android:textColor="@color/filter_text"
+                    android:layout_marginHorizontal="@dimen/margin_small"/>
+
+                <EditText
+                    android:id="@+id/etPrecioMax"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_weight="1"
+                    android:hint="@string/filter_price_max_hint"
+                    android:inputType="numberDecimal"
+                    android:textSize="@dimen/text_small"
+                    android:padding="@dimen/padding_small"
+                    android:layout_marginStart="@dimen/margin_small"
+                    android:background="@drawable/bg_filter_input"
+                    android:textColor="@color/filter_text"
+                    android:textColorHint="@color/filter_hint"/>
+            </LinearLayout>
+
+            <!-- Categoría y Tipo en la misma fila -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/margin_medium">
+
+                <!-- Categoría -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="@dimen/margin_small">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_category"
+                        style="@style/FilterTitle"/>
+
+                    <Spinner
+                        android:id="@+id/spinnerCategoria"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/button_height"
+                        android:background="@drawable/bg_filter_input"
+                        android:popupBackground="@color/filter_background"/>
+
+                </LinearLayout>
+
+                <!-- Tipo -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="@dimen/margin_small">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/filter_type"
+                        style="@style/FilterTitle"/>
+
+                    <Spinner
+                        android:id="@+id/spinnerTipo"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/button_height"
+                        android:background="@drawable/bg_filter_input"
+                        android:popupBackground="@color/filter_background"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Filtros de botones circulares -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="@dimen/margin_medium">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/filter_rapid_filters"
+                    style="@style/FilterTitle"/>
+
+                <GridLayout
+                    android:id="@+id/layoutFiltrosRapidos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:rowCount="2"
+                    android:useDefaultMargins="true"
+                    android:layout_marginTop="@dimen/margin_small">
+
+                    <CheckBox
+                        android:id="@+id/checkMenos50"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:text="@string/filter_less_than_50"/>
+
+                    <CheckBox
+                        android:id="@+id/checkPocasUnidades"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:text="@string/filter_last_units"/>
+
+                    <CheckBox
+                        android:id="@+id/checkOferta"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:text="@string/filter_offer"/>
+
+                    <CheckBox
+                        android:id="@+id/checkNuevos"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:text="@string/filter_new"/>
+
+                </GridLayout>
+
+            </LinearLayout>
+
+            <!-- Botones de acción -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="@dimen/margin_medium">
+
+                <Button
+                    android:id="@+id/btnAplicarFiltros"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_weight="1"
+                    android:text="@string/filter_apply"
+                    android:textSize="@dimen/text_medium"
+                    android:backgroundTint="@color/primary"
+                    android:textColor="@color/onPrimary"
+                    android:layout_marginEnd="@dimen/margin_small" />
+
+                <Button
+                    android:id="@+id/btnLimpiarFiltros"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/button_height"
+                    android:layout_weight="1"
+                    android:text="@string/filter_clear"
+                    android:textSize="@dimen/text_medium"
+                    android:backgroundTint="@color/surface"
+                    android:textColor="@color/text"
+                    android:layout_marginStart="@dimen/margin_small" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Contenedor para RecyclerView + ProgressBar -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- RecyclerView para mostrar productos -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvProductos"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="@dimen/padding_medium" />
+
+            <!-- ProgressBar centrado sobre el RecyclerView -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
+
+        </FrameLayout>
+
     </LinearLayout>
 
-    <!-- Contenedor para RecyclerView + ProgressBar -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+    <!-- Floating Action Button del Carrito -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabCarrito"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/margin_large"
+        android:src="@drawable/ic_cart"
+        android:contentDescription="Carrito de compras"
+        app:fabSize="normal"
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/precio_color"
+        app:elevation="6dp"/>
 
-        <!-- RecyclerView para mostrar productos -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvProductos"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="@dimen/padding_medium" />
+    <!-- Badge del carrito (contador) -->
+    <TextView
+        android:id="@+id/badgeCarrito"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/margin_large"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:background="@drawable/bg_circle_accent"
+        android:text="0"
+        android:textSize="12sp"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:visibility="gone"/>
 
-        <!-- ProgressBar centrado sobre el RecyclerView -->
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"/>
-
-    </FrameLayout>
-
-</LinearLayout>
+</FrameLayout>
