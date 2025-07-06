@@ -35,5 +35,19 @@
 
     <color name="back_button">@color/primary</color>
 
+    <!-- Colores del sistema Material Design -->
+    <color name="colorPrimary">@color/primary</color>
+    <color name="colorPrimaryVariant">@color/primary</color>
+    <color name="colorOnPrimary">@color/onPrimary</color>
+    <color name="colorSecondary">@color/accent</color>
+    <color name="colorSecondaryVariant">@color/accent</color>
+    <color name="colorOnSecondary">@color/onPrimary</color>
+    <color name="colorSurface">@color/surface</color>
+    <color name="colorOnSurface">@color/onSurface</color>
+    <color name="colorError">@color/error</color>
+    <color name="colorOnError">@color/onPrimary</color>
+    <color name="colorBackground">@color/background</color>
+    <color name="colorOnBackground">@color/text</color>
+
 </resources>
 

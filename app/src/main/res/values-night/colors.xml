@@ -17,4 +17,25 @@
     <color name="menos_50_icon">#000000</color>
     <color name="notificacion_icon">#FFFFFF</color>
     <color name="back_button">@color/primary</color>
+    
+    <!-- Colores del sistema Material Design para modo oscuro -->
+    <color name="colorPrimary">@color/primary</color>
+    <color name="colorPrimaryVariant">@color/primary</color>
+    <color name="colorOnPrimary">@color/onPrimary</color>
+    <color name="colorSecondary">@color/primary</color>
+    <color name="colorSecondaryVariant">@color/primary</color>
+    <color name="colorOnSecondary">@color/onPrimary</color>
+    <color name="colorSurface">@color/surface</color>
+    <color name="colorOnSurface">@color/onSurface</color>
+    <color name="colorError">#F44336</color>
+    <color name="colorOnError">@color/onPrimary</color>
+    <color name="colorBackground">@color/background</color>
+    <color name="colorOnBackground">@color/text</color>
+    
+    <!-- Colores adicionales -->
+    <color name="accent">@color/primary</color>
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FF9800</color>
+    <color name="error">#F44336</color>
+    <color name="outline">#404040</color>
 </resources>

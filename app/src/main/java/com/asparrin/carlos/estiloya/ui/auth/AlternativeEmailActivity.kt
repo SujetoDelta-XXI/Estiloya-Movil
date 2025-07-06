@@ -49,13 +49,23 @@ class AlternativeEmailActivity : AppCompatActivity() {
         authViewModel.registerEmailResult.observe(this) { response ->
             if (response.success) {
                 Toast.makeText(this, "Correo alternativo registrado exitosamente", Toast.LENGTH_LONG).show()
-                // Navegar a la actividad de 2FA
+                
+                // Navegar directamente a la actividad de 2FA
+                Log.d(TAG, "Correo alternativo registrado, navegando a 2FA")
                 val intent = Intent(this, TwoFactorActivity::class.java)
                 startActivity(intent)
                 finish()
             } else {
                 val message = response.message ?: "Error desconocido al registrar correo alternativo"
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                
+                // TEMPORAL: Si falla el registro, navegar de todas formas a 2FA
+                // para que el backend maneje la configuración
+                Log.d(TAG, "Error en registro de email alternativo, navegando a 2FA de todas formas")
+                Toast.makeText(this, "Navegando a verificación 2FA...", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, TwoFactorActivity::class.java)
+                startActivity(intent)
+                finish()
             }
         }
     }
@@ -68,6 +78,11 @@ class AlternativeEmailActivity : AppCompatActivity() {
                 Log.d(TAG, "Registrando correo alternativo: $alternativeEmail")
                 // Obtener el correo principal del SessionManager o del intent
                 val mainEmail = intent.getStringExtra("main_email") ?: ""
+                
+                // Guardar el correo alternativo localmente para uso temporal
+                saveAlternativeEmailLocally(alternativeEmail)
+                
+                // Intentar registrar en el backend
                 authViewModel.registerAlternativeEmail(mainEmail, alternativeEmail)
             }
         }
@@ -75,6 +90,12 @@ class AlternativeEmailActivity : AppCompatActivity() {
         binding.backButton.setOnClickListener {
             finish()
         }
+    }
+    
+    private fun saveAlternativeEmailLocally(email: String) {
+                        val sharedPreferences = getSharedPreferences("EstiloyaSession", MODE_PRIVATE)
+        sharedPreferences.edit().putString("alternative_email", email).apply()
+        Log.d(TAG, "Alternative email saved locally: $email")
     }
     
     private fun validateEmail(email: String): Boolean {

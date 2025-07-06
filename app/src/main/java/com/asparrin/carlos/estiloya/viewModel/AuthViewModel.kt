@@ -1,6 +1,7 @@
 package com.asparrin.carlos.estiloya.viewModel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,10 @@ import com.asparrin.carlos.estiloya.utils.SessionManager
 import kotlinx.coroutines.launch
 
 class AuthViewModel(private val context: Context) : ViewModel() {
+    
+    companion object {
+        private const val TAG = "AuthViewModel"
+    }
     
     private val authRepository = AuthRepository(context)
     private val sessionManager = SessionManager(context)
@@ -53,13 +58,18 @@ class AuthViewModel(private val context: Context) : ViewModel() {
             authRepository.register(nombre, apellidos, correo, contraseña, telefono)
                 .onSuccess { response ->
                     _registerResult.value = response
-                    if (response.success && response.token != null) {
-                        // Guardar token temporal si requiere 2FA
-                        if (response.requires2FA) {
-                            sessionManager.saveTemporaryToken(response.token)
+                    if (response.success && response.jwt != null) {
+                        if (response.requiere2FA) {
+                            // Guardar token temporal para 2FA
+                            sessionManager.saveTemporaryToken(response.jwt)
+                            // Guardar información del usuario si está disponible
+                            if (response.user != null) {
+                                sessionManager.saveUser(response.user)
+                            }
+                            _authState.value = AuthState.REQUIRES_2FA
                         } else {
                             // Login completo
-                            sessionManager.saveAuthToken(response.token)
+                            sessionManager.saveAuthToken(response.jwt)
                             sessionManager.saveUser(response.user)
                             _authState.value = AuthState.AUTHENTICATED
                         }
@@ -81,14 +91,28 @@ class AuthViewModel(private val context: Context) : ViewModel() {
             authRepository.login(correo, contraseña)
                 .onSuccess { response ->
                     _loginResult.value = response
-                    if (response.success && response.token != null) {
-                        if (response.requires2FA) {
+                    Log.d(TAG, "Login response recibida - success: ${response.success}, requiere2FA: ${response.requiere2FA}")
+                    Log.d(TAG, "Login response - jwt: ${response.jwt?.take(50)}...")
+                    
+                    if (response.success && response.jwt != null) {
+                        if (response.requiere2FA) {
                             // Guardar token temporal para 2FA
-                            sessionManager.saveTemporaryToken(response.token)
+                            Log.d(TAG, "Guardando token temporal para 2FA: ${response.jwt.take(50)}...")
+                            sessionManager.saveTemporaryToken(response.jwt)
+                            
+                            // Verificar que se guardó correctamente
+                            val savedToken = sessionManager.getTemporaryToken()
+                            Log.d(TAG, "Token temporal guardado y verificado: ${savedToken?.take(50)}...")
+                            
+                            // Guardar información del usuario si está disponible
+                            if (response.user != null) {
+                                sessionManager.saveUser(response.user)
+                            }
                             _authState.value = AuthState.REQUIRES_2FA
                         } else {
                             // Login completo
-                            sessionManager.saveAuthToken(response.token)
+                            Log.d(TAG, "Guardando token de autenticación: ${response.jwt.take(50)}...")
+                            sessionManager.saveAuthToken(response.jwt)
                             sessionManager.saveUser(response.user)
                             _authState.value = AuthState.AUTHENTICATED
                         }
@@ -109,12 +133,12 @@ class AuthViewModel(private val context: Context) : ViewModel() {
             
             authRepository.loginWithGoogle(idToken)
                 .onSuccess { response ->
-                    if (response.success && response.token != null) {
-                        if (response.requires2FA) {
-                            sessionManager.saveTemporaryToken(response.token)
+                    if (response.success && response.jwt != null) {
+                        if (response.requiere2FA) {
+                            sessionManager.saveTemporaryToken(response.jwt)
                             _authState.value = AuthState.REQUIRES_2FA
                         } else {
-                            sessionManager.saveAuthToken(response.token)
+                            sessionManager.saveAuthToken(response.jwt)
                             sessionManager.saveUser(response.user)
                             _authState.value = AuthState.AUTHENTICATED
                         }
@@ -129,26 +153,53 @@ class AuthViewModel(private val context: Context) : ViewModel() {
     }
     
     // Métodos de 2FA
-    fun verify2FA(correo: String, code: String) {
+    fun verify2FA(correoPrincipal: String, code: String) {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = ""
             
-            authRepository.verify2FA(correo, code)
-                .onSuccess { response ->
-                    _twoFactorResult.value = response
-                    if (response.success && response.token != null) {
-                        // Login completo después de 2FA
-                        sessionManager.saveAuthToken(response.token)
-                        sessionManager.saveUser(response.user)
-                        _authState.value = AuthState.AUTHENTICATED
+            try {
+                Log.d(TAG, "=== VERIFY 2FA DEBUG ===")
+                Log.d(TAG, "Correo principal: $correoPrincipal")
+                Log.d(TAG, "Código: $code")
+                Log.d(TAG, "Token temporal disponible: ${sessionManager.getTemporaryToken() != null}")
+                Log.d(TAG, "Token temporal: ${sessionManager.getTemporaryToken()?.take(50)}...")
+                Log.d(TAG, "Token auth disponible: ${sessionManager.getAuthToken() != null}")
+                Log.d(TAG, "=== END VERIFY 2FA DEBUG ===")
+                
+                Log.d(TAG, "Intentando verificar código 2FA para correo principal: $correoPrincipal")
+                authRepository.verify2FA(correoPrincipal, code)
+                    .onSuccess { response ->
+                        Log.d(TAG, "✅ Verificación 2FA exitosa")
+                        Log.d(TAG, "Response: success=${response.success}, token=${response.token?.take(50)}...")
+                        _twoFactorResult.value = response
+                        
+                        // Si hay token, considerar la verificación exitosa
+                        if (response.token != null) {
+                            Log.d(TAG, "Guardando token final de autenticación")
+                            sessionManager.saveAuthToken(response.token)
+                            if (response.user != null) {
+                                sessionManager.saveUser(response.user)
+                            }
+                            // Limpiar token temporal ya que ahora tenemos el token final
+                            sessionManager.clearTemporaryToken()
+
+                            _authState.value = AuthState.AUTHENTICATED
+                        } else {
+                            Log.e(TAG, "❌ Verificación 2FA falló: no hay token en la respuesta")
+                            _errorMessage.value = "Error en la verificación 2FA: no se recibió token"
+                        }
                     }
-                }
-                .onFailure { exception ->
-                    _errorMessage.value = exception.message ?: "Error en la verificación 2FA"
-                }
-            
-            _isLoading.value = false
+                    .onFailure { exception ->
+                        Log.e(TAG, "❌ Error en verificación 2FA", exception)
+                        _errorMessage.value = exception.message ?: "Error en la verificación 2FA"
+                    }
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Exception en verify2FA", e)
+                _errorMessage.value = "Error en la verificación 2FA"
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
     
@@ -157,38 +208,52 @@ class AuthViewModel(private val context: Context) : ViewModel() {
             _isLoading.value = true
             _errorMessage.value = ""
             
-            authRepository.registerAlternativeEmail(correo, alternativeEmail)
-                .onSuccess { response ->
-                    _registerEmailResult.value = response
-                    if (response.success) {
-                        // Email alternativo registrado exitosamente
+            try {
+                Log.d(TAG, "Intentando registrar email alternativo: $alternativeEmail")
+                authRepository.registerAlternativeEmail(correo, alternativeEmail)
+                    .onSuccess { response ->
+                        Log.d(TAG, "✅ Email alternativo registrado exitosamente en backend")
+                        _registerEmailResult.value = response
                     }
-                }
-                .onFailure { exception ->
-                    _errorMessage.value = exception.message ?: "Error al registrar email alternativo"
-                }
-            
-            _isLoading.value = false
+                    .onFailure { exception ->
+                        Log.e(TAG, "❌ Error al registrar email alternativo en backend", exception)
+                        _errorMessage.value = exception.message ?: "Error al registrar email alternativo"
+                    }
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Exception en registerAlternativeEmail", e)
+                _errorMessage.value = "Error al registrar email alternativo"
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
     
-    fun send2FACode(correo: String) {
+    fun send2FACode() {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = ""
             
-            authRepository.send2FACode(correo)
-                .onSuccess { response ->
-                    _sendCodeResult.value = response
-                    if (response.success) {
-                        // Código enviado exitosamente
+            try {
+                Log.d(TAG, "Intentando enviar código 2FA")
+                authRepository.send2FACode("correo") // El backend maneja el correo alternativo
+                    .onSuccess { response ->
+                        Log.d(TAG, "✅ Código 2FA enviado exitosamente")
+                        _sendCodeResult.value = response
                     }
-                }
-                .onFailure { exception ->
-                    _errorMessage.value = exception.message ?: "Error al enviar código 2FA"
-                }
-            
-            _isLoading.value = false
+                    .onFailure { exception ->
+                        Log.e(TAG, "❌ Error al enviar código 2FA", exception)
+                        val errorMessage = exception.message ?: "Error desconocido"
+                        
+                        // Si hay error del backend, mostrar el mensaje
+                        Log.e(TAG, "❌ Error del backend al enviar código 2FA: $errorMessage")
+                        _errorMessage.value = errorMessage
+                    }
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Exception en send2FACode", e)
+                _errorMessage.value = "Error al enviar código 2FA"
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
     
@@ -293,20 +358,23 @@ class AuthViewModel(private val context: Context) : ViewModel() {
     }
     
     // Métodos de gestión de sesión
-    fun logout() {
-        sessionManager.clearSession()
-        _authState.value = AuthState.NOT_AUTHENTICATED
-    }
-    
     fun checkAuthState() {
-        val token = sessionManager.getAuthToken()
+        val authToken = sessionManager.getAuthToken()
         val user = sessionManager.getUser()
         
-        if (token != null && user != null) {
+        if (authToken != null && user != null) {
+            // Usuario completamente autenticado
             _authState.value = AuthState.AUTHENTICATED
         } else {
+            // Usuario no autenticado (incluye procesos incompletos)
             _authState.value = AuthState.NOT_AUTHENTICATED
         }
+    }
+    
+    fun logout() {
+        // Limpiar toda la sesión
+        sessionManager.clearSession()
+        _authState.value = AuthState.NOT_AUTHENTICATED
     }
     
     fun clearError() {

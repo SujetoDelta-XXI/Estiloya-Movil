@@ -17,11 +17,15 @@ data class RegisterRequest(
 )
 
 data class AuthResponse(
-    val success: Boolean,
-    val message: String,
+    val success: Boolean = true,
+    val message: String? = null,
     val token: String? = null,
     val user: Usuario? = null,
-    val requires2FA: Boolean = false
+    @SerializedName("requiere2FA")
+    val requiere2FA: Boolean = false,
+    val metodos: Map<String, Boolean>? = null,
+    val correo: String? = null,
+    val jwt: String? = null
 )
 
 // Modelos para 2FA
@@ -31,8 +35,8 @@ data class TwoFactorRequest(
 )
 
 data class TwoFactorResponse(
-    val success: Boolean,
-    val message: String,
+    val success: Boolean = true,
+    val message: String? = null,
     val token: String? = null,
     val user: Usuario? = null
 )
@@ -83,11 +87,15 @@ data class GoogleLoginRequest(
 )
 
 data class GoogleLoginResponse(
-    val success: Boolean,
-    val message: String,
+    val success: Boolean = true,
+    val message: String? = null,
     val token: String? = null,
     val user: Usuario? = null,
-    val requires2FA: Boolean = false
+    @SerializedName("requiere2FA")
+    val requiere2FA: Boolean = false,
+    val metodos: Map<String, Boolean>? = null,
+    val correo: String? = null,
+    val jwt: String? = null
 )
 
 // Modelo para prueba de conexión

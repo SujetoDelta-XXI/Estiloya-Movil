@@ -2,7 +2,15 @@
     <style name="Theme.Estiloya" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Colores claros -->
         <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary</item>
         <item name="colorOnPrimary">@color/onPrimary</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorSecondaryVariant">@color/accent</item>
+        <item name="colorOnSecondary">@color/onPrimary</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/onSurface</item>
+        <item name="colorError">@color/error</item>
+        <item name="colorOnError">@color/onPrimary</item>
         <item name="android:colorBackground">@color/background</item>
         <item name="colorOnBackground">@color/text</item>
         <item name="android:windowBackground">@color/background</item>

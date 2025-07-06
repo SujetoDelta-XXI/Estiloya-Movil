@@ -2,6 +2,7 @@ package com.asparrin.carlos.estiloya.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.asparrin.carlos.estiloya.data.model.Usuario
 import com.google.gson.Gson
 
@@ -45,17 +46,23 @@ class SessionManager(context: Context) {
         val editor = sharedPreferences.edit()
         editor.putString(KEY_TEMPORARY_TOKEN, token)
         editor.apply()
+        Log.d("SessionManager", "Temporary token saved: ${token.take(50)}...")
     }
     
     fun getTemporaryToken(): String? {
-        return sharedPreferences.getString(KEY_TEMPORARY_TOKEN, null)
+        val token = sharedPreferences.getString(KEY_TEMPORARY_TOKEN, null)
+        Log.d("SessionManager", "Temporary token retrieved: ${token?.take(50) ?: "null"}...")
+        return token
     }
     
     fun clearTemporaryToken() {
         val editor = sharedPreferences.edit()
         editor.remove(KEY_TEMPORARY_TOKEN)
         editor.apply()
+        Log.d("SessionManager", "Temporary token cleared")
     }
+    
+
     
     // Métodos para usuario
     fun saveUser(user: Usuario?) {
@@ -103,6 +110,7 @@ class SessionManager(context: Context) {
         val editor = sharedPreferences.edit()
         editor.clear()
         editor.apply()
+        Log.d("SessionManager", "Session cleared completely")
     }
     
     // Método para obtener el token activo (principal o temporal)

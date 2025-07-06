@@ -74,8 +74,13 @@ class LoginActivity : AppCompatActivity() {
         
         // Observar resultado del login
         authViewModel.loginResult.observe(this) { response ->
+            Log.d(TAG, "Login response recibida: success=${response.success}, requiere2FA=${response.requiere2FA}")
+            Log.d(TAG, "Login response - metodos: ${response.metodos}")
+            Log.d(TAG, "Login response - correo: ${response.correo}")
+            Log.d(TAG, "Login response - user: ${response.user}")
+            
             if (response.success) {
-                if (response.requires2FA) {
+                if (response.requiere2FA) {
                     Log.d(TAG, "Login exitoso pero requiere 2FA")
                     // El estado se manejará en authState
                 } else {
@@ -141,23 +146,31 @@ class LoginActivity : AppCompatActivity() {
     }
     
     private fun checkAlternativeEmail() {
-        val user = authViewModel.loginResult.value?.user
-        if (user != null) {
-            if (user.correoAuth.isNullOrEmpty()) {
-                // No tiene correo alternativo, ir a configurar
-                Log.d(TAG, "Usuario no tiene correo alternativo, navegando a configuración")
-                val intent = Intent(this, AlternativeEmailActivity::class.java)
-                intent.putExtra("main_email", user.correo)
-                startActivity(intent)
-            } else {
-                // Tiene correo alternativo, ir a 2FA
-                Log.d(TAG, "Usuario tiene correo alternativo, navegando a 2FA")
-                val intent = Intent(this, TwoFactorActivity::class.java)
-                startActivity(intent)
-            }
-        } else {
-            Log.e(TAG, "Error: No se pudo obtener información del usuario")
-            Toast.makeText(this, "Error al obtener información del usuario", Toast.LENGTH_LONG).show()
+        val loginResponse = authViewModel.loginResult.value
+        val user = loginResponse?.user
+        val correo = loginResponse?.correo
+        val metodos = loginResponse?.metodos
+        
+        Log.d(TAG, "=== checkAlternativeEmail DEBUG ===")
+        Log.d(TAG, "loginResponse completo: $loginResponse")
+        Log.d(TAG, "user: ${user != null}, correo: $correo")
+        Log.d(TAG, "metodos: $metodos")
+        Log.d(TAG, "user?.correoAuth: ${user?.correoAuth}")
+        Log.d(TAG, "metodos?.get(\"correo\"): ${metodos?.get("correo")}")
+        Log.d(TAG, "metodos?.get(\"sms\"): ${metodos?.get("sms")}")
+        Log.d(TAG, "=== FIN DEBUG ===")
+        
+        // SOLUCIÓN TEMPORAL: Si requiere 2FA, ir directamente a TwoFactorActivity
+        // El backend manejará el envío del código al email alternativo configurado
+        Log.d(TAG, "DECISIÓN: Requiere 2FA, navegando directamente a TwoFactorActivity")
+        val intent = Intent(this, TwoFactorActivity::class.java)
+        if (correo != null) {
+            intent.putExtra("main_email", correo)
         }
+        if (user != null) {
+            intent.putExtra("main_email", user.correo)
+        }
+        startActivity(intent)
+        finish() // Cerrar LoginActivity para evitar que vuelva atrás
     }
 }

@@ -70,7 +70,7 @@ class RegisterActivity : AppCompatActivity() {
         // Observar resultado de registro
         authViewModel.registerResult.observe(this) { response ->
             if (response.success) {
-                if (response.requires2FA) {
+                if (response.requiere2FA) {
                     Toast.makeText(this, "Registro exitoso. Se requiere verificación 2FA", Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()

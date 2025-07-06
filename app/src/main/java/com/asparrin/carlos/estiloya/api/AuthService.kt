@@ -18,13 +18,13 @@ interface AuthService {
     
     // Endpoints de 2FA
     @POST("auth/login/verify-2fa")
-    suspend fun verify2FA(@Body request: TwoFactorRequest): Response<TwoFactorResponse>
+    suspend fun verify2FA(@Query("code") code: String): Response<TwoFactorResponse>
     
     @POST("auth/2fa/register-email")
-    suspend fun registerAlternativeEmail(@Body request: RegisterEmailRequest): Response<RegisterEmailResponse>
+    suspend fun registerAlternativeEmail(@Query("alternativo") alternativeEmail: String): Response<RegisterEmailResponse>
     
     @POST("auth/2fa/send-code")
-    suspend fun send2FACode(@Body request: SendCodeRequest): Response<SendCodeResponse>
+    suspend fun send2FACode(@Query("metodo") metodo: String = "correo"): Response<SendCodeResponse>
     
     // Endpoints de recuperación de contraseña
     @POST("auth/forgot-password")
