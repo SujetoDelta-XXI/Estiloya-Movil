@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <application
+        android:name=".EstiloyaApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -34,6 +35,9 @@
 
         <activity android:name=".ui.auth.LoginActivity" />
         <activity android:name=".ui.auth.RegisterActivity" />
+        <activity android:name=".ui.auth.TwoFactorActivity" />
+        <activity android:name=".ui.auth.AlternativeEmailActivity" />
+        <activity android:name=".ui.auth.ForgotPasswordActivity" />
         <activity android:name=".ui.home.HomeActivity" />
         <activity
             android:name=".ui.disenar.DisenarActivity"
@@ -43,6 +47,7 @@
         <activity android:name=".ui.perfil.PerfilUsuarioActivity" />
         <activity android:name=".ui.productos.ProductosActivity" />
         <activity android:name=".ui.productos.DetalleProductoActivity" />
+        <activity android:name=".ui.carrito.CarritoActivity" />
 
     </application>
 

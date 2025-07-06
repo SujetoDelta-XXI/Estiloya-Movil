@@ -22,18 +22,17 @@ class CustomDesignViewModel(application: Application) : AndroidViewModel(applica
     private val context = getApplication<Application>().applicationContext
     private val sessionManager = SessionManager(context)
 
-    private fun getUserKey(): String? {
-        // Puedes usar el correo o el id, aquí usamos el correo
-        return sessionManager.obtenerCorreo()
+    private fun obtenerEmailUsuario(): String {
+        return sessionManager.getUser()?.correo ?: ""
     }
 
     fun cargarMisDisenos() {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
-            val userKey = getUserKey()
+            val userKey = obtenerEmailUsuario()
             Log.d("CustomDesignViewModel", "Cargando diseños para usuario: $userKey")
-            if (userKey != null) {
+            if (userKey.isNotEmpty()) {
                 val disenos = LocalDesignStorage.obtenerDisenos(context, userKey)
                 _disenos.value = disenos
                 Log.d("CustomDesignViewModel", "Diseños cargados: ${disenos.size}")
@@ -50,9 +49,9 @@ class CustomDesignViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
-            val userKey = getUserKey()
+            val userKey = obtenerEmailUsuario()
             Log.d("CustomDesignViewModel", "Guardando diseño para usuario: $userKey")
-            if (userKey != null) {
+            if (userKey.isNotEmpty()) {
                 val nuevoDiseno = CustomDesign(
                     id = System.currentTimeMillis(), // ID único local
                     urlImagen = urlImagen,

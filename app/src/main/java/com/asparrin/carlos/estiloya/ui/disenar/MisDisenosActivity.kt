@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.asparrin.carlos.estiloya.R
@@ -15,7 +14,7 @@ import com.asparrin.carlos.estiloya.ui.components.CustomDesignAdapter
 import com.asparrin.carlos.estiloya.viewModel.CustomDesignViewModel
 import com.asparrin.carlos.estiloya.ui.base.BaseActivity
 
-class MisDisenosActivity : com.asparrin.carlos.estiloya.ui.base.BaseActivity() {
+class MisDisenosActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMisDisenosBinding
     private lateinit var viewModel: CustomDesignViewModel
@@ -27,7 +26,7 @@ class MisDisenosActivity : com.asparrin.carlos.estiloya.ui.base.BaseActivity() {
         super.onCreate(savedInstanceState)
         val contentFrame = findViewById<android.widget.FrameLayout>(R.id.content_frame)
         val child = contentFrame.getChildAt(0)
-        binding = com.asparrin.carlos.estiloya.databinding.ActivityMisDisenosBinding.bind(child)
+        binding = ActivityMisDisenosBinding.bind(child)
 
         setupRecyclerView()
         setupViewModel()
@@ -49,10 +48,11 @@ class MisDisenosActivity : com.asparrin.carlos.estiloya.ui.base.BaseActivity() {
     private fun setupRecyclerView() {
         adapter = CustomDesignAdapter(
             onItemClick = { diseno ->
-                // Mostrar detalles del diseño
                 mostrarDetallesDiseno(diseno)
             }
         )
+        binding.rvDisenos.layoutManager = LinearLayoutManager(this)
+        binding.rvDisenos.adapter = adapter
     }
 
     private fun setupViewModel() {
@@ -94,7 +94,13 @@ class MisDisenosActivity : com.asparrin.carlos.estiloya.ui.base.BaseActivity() {
 
     private fun actualizarEstadoVacio(isEmpty: Boolean) {
         Log.d("MisDisenosActivity", "Actualizando estado vacío: isEmpty=$isEmpty")
-        binding.llEmptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        if (isEmpty) {
+            binding.llEmptyState.visibility = View.VISIBLE
+            binding.rvDisenos.visibility = View.GONE
+        } else {
+            binding.llEmptyState.visibility = View.GONE
+            binding.rvDisenos.visibility = View.VISIBLE
+        }
         Log.d("MisDisenosActivity", "Estado vacío: ${if (isEmpty) "VISIBLE" else "GONE"}, RecyclerView: ${if (isEmpty) "GONE" else "VISIBLE"}")
     }
 
@@ -111,7 +117,7 @@ class MisDisenosActivity : com.asparrin.carlos.estiloya.ui.base.BaseActivity() {
         """.trimIndent()
 
         Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
-        
+
         // Aquí podrías abrir una actividad de detalles más elaborada
         // Intent(this, DetalleDisenoActivity::class.java).apply {
         //     putExtra("diseno_id", diseno.id)
@@ -132,4 +138,4 @@ class MisDisenosActivity : com.asparrin.carlos.estiloya.ui.base.BaseActivity() {
         onBackPressed()
         return true
     }
-} 
+}

@@ -42,17 +42,17 @@ class PerfilActivity : BaseActivity() {
 
     private fun cargarDatosUsuario() {
         // Obtener datos del usuario desde SessionManager
-        val nombre = sessionManager.obtenerNombre()
+        val user = sessionManager.getUser()
         
-        if (nombre != null && sessionManager.estaLogueado()) {
-            // Mostrar datos del usuario (simplificado por ahora)
-            binding.tvNombreCompleto.text = nombre
-            binding.tvEmail.text = "usuario@email.com" // Placeholder
+        if (user != null && sessionManager.estaLogueado()) {
+            // Mostrar datos del usuario
+            binding.tvNombreCompleto.text = "${user.nombre} ${user.apellidos}"
+            binding.tvEmail.text = user.correo
             
-            binding.etNombre.setText(nombre)
-            binding.etApellidos.setText("Apellidos") // Placeholder
-            binding.etEmail.setText("usuario@email.com") // Placeholder
-            binding.etTelefono.setText("") // Placeholder
+            binding.etNombre.setText(user.nombre)
+            binding.etApellidos.setText(user.apellidos)
+            binding.etEmail.setText(user.correo)
+            binding.etTelefono.setText(user.telefono ?: "")
         } else {
             // Si no hay usuario logueado, mostrar mensaje
             Toast.makeText(this, "No hay datos de usuario disponibles", Toast.LENGTH_SHORT).show()

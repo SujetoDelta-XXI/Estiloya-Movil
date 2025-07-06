@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground">
+
+    <!-- Header con título y botón vaciar carrito -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/padding_medium"
+        android:gravity="center_vertical"
+        android:background="@color/surface">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Mi Carrito"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold"
+            android:textColor="?android:textColorPrimary"/>
+
+        <Button
+            android:id="@+id/btnVaciarCarrito"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vaciar"
+            android:textSize="@dimen/text_small"
+            android:background="@drawable/bg_button_outline"
+            android:textColor="?android:textColorPrimary"
+            android:visibility="gone"/>
+
+    </LinearLayout>
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_margin="@dimen/margin_medium"/>
+
+    <!-- Contenido principal -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- Lista de productos del carrito -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCarrito"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/padding_medium"
+            android:clipToPadding="false"/>
+
+        <!-- Estado vacío -->
+        <LinearLayout
+            android:id="@+id/layoutCarritoVacio"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="@dimen/padding_large"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/ic_cart"
+                android:alpha="0.5"
+                android:layout_marginBottom="@dimen/margin_large"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tu carrito está vacío"
+                android:textSize="@dimen/text_title"
+                android:textStyle="bold"
+                android:textColor="?android:textColorSecondary"
+                android:layout_marginBottom="@dimen/margin_medium"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Agrega productos para comenzar a comprar"
+                android:textSize="@dimen/text_medium"
+                android:textColor="?android:textColorSecondary"
+                android:gravity="center"
+                android:layout_marginBottom="@dimen/margin_large"/>
+
+            <Button
+                android:id="@+id/btnIrProductos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ver Productos"
+                android:textSize="@dimen/text_medium"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- Resumen de compra -->
+    <LinearLayout
+        android:id="@+id/layoutResumen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/padding_medium"
+        android:background="@color/surface"
+        android:elevation="4dp"
+        android:visibility="gone">
+
+        <!-- Línea divisoria -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/outline"
+            android:layout_marginBottom="@dimen/margin_medium"/>
+
+        <!-- Detalles del resumen -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="@dimen/margin_medium">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/margin_small">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Subtotal"
+                    android:textSize="@dimen/text_medium"
+                    android:textColor="?android:textColorSecondary"/>
+
+                <TextView
+                    android:id="@+id/textSubtotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="S/ 0.00"
+                    android:textSize="@dimen/text_medium"
+                    android:textColor="?android:textColorPrimary"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/margin_small">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Descuento"
+                    android:textSize="@dimen/text_medium"
+                    android:textColor="?android:textColorSecondary"/>
+
+                <TextView
+                    android:id="@+id/textDescuento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="S/ 0.00"
+                    android:textSize="@dimen/text_medium"
+                    android:textColor="@color/success"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="@dimen/margin_medium">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Total"
+                    android:textSize="@dimen/text_title"
+                    android:textStyle="bold"
+                    android:textColor="?android:textColorPrimary"/>
+
+                <TextView
+                    android:id="@+id/textTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="S/ 0.00"
+                    android:textSize="@dimen/text_title"
+                    android:textStyle="bold"
+                    android:textColor="@color/precio_color"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/textCantidadItems"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 items"
+                android:textSize="@dimen/text_small"
+                android:textColor="?android:textColorSecondary"/>
+
+        </LinearLayout>
+
+        <!-- Botón finalizar compra -->
+        <Button
+            android:id="@+id/btnFinalizarCompra"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_large"
+            android:text="Finalizar Compra"
+            android:textSize="@dimen/text_medium"
+            android:textStyle="bold"
+            android:background="@color/precio_color"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
+
+</LinearLayout> 

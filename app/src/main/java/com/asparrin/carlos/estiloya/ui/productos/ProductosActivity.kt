@@ -18,6 +18,9 @@ import com.asparrin.carlos.estiloya.data.model.Producto
 import com.asparrin.carlos.estiloya.data.model.PaginatedResponse
 import com.asparrin.carlos.estiloya.databinding.ActivityProductosBinding
 import com.asparrin.carlos.estiloya.ui.base.BaseActivity
+import com.asparrin.carlos.estiloya.ui.components.CantidadDialog
+import androidx.lifecycle.ViewModelProvider
+import com.asparrin.carlos.estiloya.viewModel.CarritoViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,8 +46,11 @@ class ProductosActivity : BaseActivity() {
 
     // Servicios
     private val categoriaService: CategoriaService by lazy {
-        ApiClient.retrofit.create(CategoriaService::class.java)
+        ApiClient.createCategoriaService(this)
     }
+    
+    // ViewModel del carrito
+    private lateinit var carritoViewModel: CarritoViewModel
 
     override fun getLayoutResourceId(): Int = R.layout.activity_productos
 
@@ -63,6 +69,9 @@ class ProductosActivity : BaseActivity() {
         setupFiltrosRapidos()
         cargarCategorias()
         fetchProductosFromApi()
+        
+        // Inicializar ViewModel del carrito
+        carritoViewModel = ViewModelProvider(this)[CarritoViewModel::class.java]
     }
 
     private fun procesarParametrosEntrada() {
@@ -106,7 +115,7 @@ class ProductosActivity : BaseActivity() {
         val layoutManager = GridLayoutManager(this, 2)
         binding.rvProductos.layoutManager = layoutManager
         
-        // Configurar el adaptador (solo con botón "Agregar al carrito")
+        // Configurar el adaptador con funcionalidad de carrito
         adapter = ProductosAdapter(
             productos = emptyList(),
             onProductoClick = { producto ->
@@ -116,7 +125,7 @@ class ProductosActivity : BaseActivity() {
                 startActivity(intent)
             },
             onAgregarClick = { producto ->
-                Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
+                mostrarDialogoCantidad(producto)
             }
         )
         
@@ -311,7 +320,7 @@ class ProductosActivity : BaseActivity() {
 
     private fun fetchProductosFromApi() {
         binding.progressBar.visibility = View.VISIBLE
-        val service = ApiClient.retrofit.create(ProductService::class.java)
+        val service = ApiClient.createProductService(this)
         
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -394,20 +403,20 @@ class ProductosActivity : BaseActivity() {
             // Filtro por precio mínimo
             if (precioMinStr.isNotEmpty()) {
                 val precioMin = precioMinStr.toDoubleOrNull() ?: 0.0
-                val precioFinal = producto.precioConDescuento
+                val precioFinal = producto.precioConDescuento.toDouble()
                 cumpleFiltros = cumpleFiltros && precioFinal >= precioMin
             }
 
             // Filtro por precio máximo
             if (precioMaxStr.isNotEmpty()) {
                 val precioMax = precioMaxStr.toDoubleOrNull() ?: Double.MAX_VALUE
-                val precioFinal = producto.precioConDescuento
+                val precioFinal = producto.precioConDescuento.toDouble()
                 cumpleFiltros = cumpleFiltros && precioFinal <= precioMax
             }
 
             // Filtro por categoría
             if (categoriaSeleccionada != getString(R.string.filter_all_categories)) {
-                cumpleFiltros = cumpleFiltros && producto.categoria == categoriaSeleccionada
+                cumpleFiltros = cumpleFiltros && producto.categoriaNombre == categoriaSeleccionada
             }
 
             // Filtro por tipo
@@ -440,5 +449,15 @@ class ProductosActivity : BaseActivity() {
 
     private fun actualizarAdapter() {
         adapter.updateData(productosBuscados)
+    }
+    
+    /**
+     * Mostrar diálogo para seleccionar cantidad del producto
+     */
+    private fun mostrarDialogoCantidad(producto: Producto) {
+        val cantidadDialog = CantidadDialog(this, producto) { cantidad ->
+            carritoViewModel.agregarProducto(this, producto.id, cantidad)
+        }
+        cantidadDialog.mostrar()
     }
 }

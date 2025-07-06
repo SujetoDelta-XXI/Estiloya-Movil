@@ -20,9 +20,6 @@ import com.asparrin.carlos.estiloya.ui.home.HomeActivity
 import com.asparrin.carlos.estiloya.ui.productos.ProductosActivity
 import com.asparrin.carlos.estiloya.ui.disenar.DisenarActivity
 import com.asparrin.carlos.estiloya.utils.SessionManager
-import com.asparrin.carlos.estiloya.ui.perfil.PerfilUsuarioActivity
-import com.asparrin.carlos.estiloya.ui.disenar.MisDisenosActivity
-
 
 abstract class BaseActivity : AppCompatActivity() {
 
@@ -143,50 +140,7 @@ abstract class BaseActivity : AppCompatActivity() {
             showAsDropDown(anchor, 0, anchor.height)
         }
 
-        // 1) Opción “Perfil”
-        popupBinding.layoutPerfil.setOnClickListener {
-            popupWindow.dismiss()
-            startActivity(
-                Intent(this@BaseActivity, PerfilUsuarioActivity::class.java)
-            )
-        }
-
-        // 2) Opción “Pedidos” (si la tienes)
-        popupBinding.opPedidos.setOnClickListener {
-            // Aquí podrías lanzar tu Activity de Pedidos
-            popupWindow.dismiss()
-            // startActivity(Intent(this@BaseActivity, PedidosActivity::class.java))
-        }
-
-        // 3) Opción “Diseños”
-        popupBinding.layoutDisenos.setOnClickListener {
-            popupWindow.dismiss()
-            startActivity(
-                Intent(this@BaseActivity, MisDisenosActivity::class.java)
-            )
-        }
-
-        // 4) Separador…
-        // no hace nada
-
-        // 5) Switch Tema
-        val currentNight = (resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK) ==
-                Configuration.UI_MODE_NIGHT_YES
-        popupBinding.switchTheme.isChecked = currentNight
-        popupBinding.tvModo.text =
-            if (currentNight) "Modo oscuro" else "Modo claro"
-        popupBinding.switchTheme.setOnCheckedChangeListener { _, checked ->
-            session.saveDarkModePref(checked)
-            AppCompatDelegate.setDefaultNightMode(
-                if (checked) AppCompatDelegate.MODE_NIGHT_YES
-                else AppCompatDelegate.MODE_NIGHT_NO
-            )
-            popupWindow.dismiss()
-            this.recreate()
-        }
-
-        // 6) Login / Logout
+        // Login / Logout
         if (session.estaLogueado()) {
             popupBinding.opLogout.text = "Cerrar sesión"
             popupBinding.opLogout.setOnClickListener {
@@ -201,6 +155,47 @@ abstract class BaseActivity : AppCompatActivity() {
                 startActivity(Intent(this, LoginActivity::class.java))
                 popupWindow.dismiss()
             }
+        }
+
+        // Estado inicial del switch y label
+        val currentNight = (resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK) ==
+                Configuration.UI_MODE_NIGHT_YES
+        popupBinding.switchTheme.isChecked = currentNight
+        popupBinding.tvModo.text =
+            if (currentNight) "Modo oscuro" else "Modo claro"
+
+        // Listener para ir a Mis Diseños (toda la fila)
+        popupBinding.layoutDisenos.setOnClickListener {
+            popupWindow.dismiss()
+            if (session.estaLogueado()) {
+                startActivity(Intent(this, com.asparrin.carlos.estiloya.ui.disenar.MisDisenosActivity::class.java))
+            } else {
+                startActivity(Intent(this, LoginActivity::class.java))
+            }
+        }
+
+        // Listener para ir a la nueva interfaz de perfil (toda la fila)
+        popupBinding.layoutPerfil.setOnClickListener {
+            popupWindow.dismiss()
+            if (session.estaLogueado()) {
+                startActivity(Intent(this, com.asparrin.carlos.estiloya.ui.perfil.PerfilUsuarioActivity::class.java))
+            } else {
+                startActivity(Intent(this, LoginActivity::class.java))
+            }
+        }
+
+        // Al cambiar el switch, guardar pref y recrear UI
+        popupBinding.switchTheme.setOnCheckedChangeListener { _, checked ->
+            session.saveDarkModePref(checked)
+            AppCompatDelegate.setDefaultNightMode(
+                if (checked)
+                    AppCompatDelegate.MODE_NIGHT_YES
+                else
+                    AppCompatDelegate.MODE_NIGHT_NO
+            )
+            popupWindow.dismiss()
+            this.recreate()
         }
     }
 }

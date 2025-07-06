@@ -16,6 +16,5 @@
         <!-- Configuraciones para filtros -->
         <item name="android:textColor">@color/filter_text</item>
         <item name="android:textColorHint">@color/filter_hint</item>
-        <item name="android:colorBackground">@color/filter_background</item>
     </style>
 </resources>

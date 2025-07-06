@@ -10,7 +10,7 @@ object MockUsuario {
             nombre = "Carlos",
             apellidos= "Asparrin",
             correo = "carlos@tecsup.edu.pe",
-            contraseña = "123456",
+            password = "123456",
             telefono = "987654321",
             rol = "USER"
         ),
@@ -19,14 +19,14 @@ object MockUsuario {
             nombre = "Lucía",
             apellidos = "Quispe",
             correo = "lucia@tecsup.edu.pe",
-            contraseña = "lucia2025",
+            password = "lucia2025",
             telefono = "912345678",
             rol = "USER"
         )
     )
 
     fun validarLogin(correo: String, clave: String): Usuario? {
-        return listaUsuarios.find { it.correo == correo && it.contraseña == clave && it.rol == "USER" }
+        return listaUsuarios.find { it.correo == correo && it.password == clave && it.rol == "USER" }
     }
 
     fun registrar(usuario: Usuario): Boolean {

@@ -5,7 +5,7 @@ data class Usuario(
     val nombre: String,
     val apellidos: String,
     val correo: String,
-    val contraseña: String,
+    val password: String,
     val telefono: String? = null,
     val fechaRegistro: String = "", // lo simulamos como texto
     val correoAuth: String? = null,

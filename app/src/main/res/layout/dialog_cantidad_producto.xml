@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/padding_large">
+
+    <!-- Título -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar Cantidad"
+        android:textSize="@dimen/text_title"
+        android:textStyle="bold"
+        android:textColor="?android:textColorPrimary"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/margin_large"/>
+
+    <!-- Información del producto -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="@dimen/margin_large">
+
+        <ImageView
+            android:id="@+id/imageProducto"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/product_image"
+            android:background="@android:color/darker_gray"
+            android:layout_marginEnd="@dimen/margin_medium"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nombre del Producto"
+                android:textSize="@dimen/text_medium"
+                android:textStyle="bold"
+                android:textColor="?android:textColorPrimary"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:layout_marginBottom="@dimen/margin_small"/>
+
+            <TextView
+                android:id="@+id/textPrecio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="S/ 55.00"
+                android:textSize="@dimen/text_medium"
+                android:textStyle="bold"
+                android:textColor="@color/precio_color"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Controles de cantidad -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/margin_large">
+
+        <Button
+            android:id="@+id/btnMenos"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="-"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold"
+            android:background="@drawable/bg_circle_accent"
+            android:textColor="@android:color/white"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"/>
+
+        <TextView
+            android:id="@+id/textCantidad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold"
+            android:textColor="?android:textColorPrimary"
+            android:layout_marginHorizontal="@dimen/margin_large"
+            android:minWidth="60dp"
+            android:gravity="center"/>
+
+        <Button
+            android:id="@+id/btnMas"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="+"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold"
+            android:background="@drawable/bg_circle_accent"
+            android:textColor="@android:color/white"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"/>
+
+    </LinearLayout>
+
+    <!-- Subtotal -->
+    <TextView
+        android:id="@+id/textSubtotal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Subtotal: S/ 55.00"
+        android:textSize="@dimen/text_medium"
+        android:textStyle="bold"
+        android:textColor="@color/precio_color"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/margin_large"/>
+
+    <!-- Botones de acción -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/btnCancelar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancelar"
+            android:textSize="@dimen/text_medium"
+            android:background="@drawable/bg_button_outline"
+            android:textColor="?android:textColorPrimary"
+            android:layout_marginEnd="@dimen/margin_small"/>
+
+        <Button
+            android:id="@+id/btnAgregar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Agregar al Carrito"
+            android:textSize="@dimen/text_medium"
+            android:background="@color/precio_color"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
+
+</LinearLayout> 

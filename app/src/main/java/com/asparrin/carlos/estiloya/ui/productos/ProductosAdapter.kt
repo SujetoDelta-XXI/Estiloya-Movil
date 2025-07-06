@@ -27,7 +27,7 @@ class ProductosAdapter(
             
             // Configurar imagen
             Glide.with(binding.root.context)
-                .load(producto.imagenUrl)
+                .load(producto.imagen)
                 .placeholder(R.drawable.ic_producto)
                 .error(R.drawable.ic_producto)
                 .into(binding.imageProducto)

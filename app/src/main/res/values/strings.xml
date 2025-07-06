@@ -4,6 +4,7 @@
     <string name="pedidos">Pedidos</string>
     <string name="nav_home">Home</string>
     <string name="nav_productos">Productos</string>
+    <string name="nav_carrito">Carrito</string>
     <string name="nav_disenar">Diseñar</string>
 
     <!--Producto-->

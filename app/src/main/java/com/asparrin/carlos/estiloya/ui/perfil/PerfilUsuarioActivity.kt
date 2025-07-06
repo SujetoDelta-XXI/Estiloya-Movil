@@ -20,7 +20,7 @@ class PerfilUsuarioActivity : BaseActivity() {
         val child = contentFrame.getChildAt(0)
         binding = ActivityPerfilUsuarioBinding.bind(child)
         sessionManager = SessionManager(this)
-        mostrarDatosUsuario()
+        cargarDatosUsuario()
         binding.btnBack.setOnClickListener {
             val intent = Intent(this, com.asparrin.carlos.estiloya.ui.home.HomeActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -29,10 +29,18 @@ class PerfilUsuarioActivity : BaseActivity() {
         }
     }
 
-    private fun mostrarDatosUsuario() {
-        val nombre = sessionManager.obtenerNombre() ?: "-"
-        val email = sessionManager.obtenerCorreo() ?: "-"
-        binding.tvNombre.text = nombre
-        binding.tvEmail.text = email
+    private fun cargarDatosUsuario() {
+        // Obtener datos del usuario desde SessionManager
+        val user = sessionManager.getUser()
+        
+        if (user != null && sessionManager.estaLogueado()) {
+            // Mostrar datos del usuario
+            binding.tvNombre.text = "${user.nombre} ${user.apellidos}"
+            binding.tvEmail.text = user.correo
+        } else {
+            // Si no hay usuario logueado, mostrar mensaje
+            Toast.makeText(this, "No hay datos de usuario disponibles", Toast.LENGTH_SHORT).show()
+            finish()
+        }
     }
 } 

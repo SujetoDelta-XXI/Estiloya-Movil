@@ -2,23 +2,32 @@ package com.asparrin.carlos.estiloya.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.viewpager2.widget.ViewPager2
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.asparrin.carlos.estiloya.R
 import com.asparrin.carlos.estiloya.api.ApiClient
 import com.asparrin.carlos.estiloya.api.CategoriaService
 import com.asparrin.carlos.estiloya.data.model.Categoria
 import com.asparrin.carlos.estiloya.databinding.ActivityHomeBinding
+import com.asparrin.carlos.estiloya.ui.auth.LoginActivity
 import com.asparrin.carlos.estiloya.ui.base.BaseActivity
 import com.asparrin.carlos.estiloya.ui.components.BannersAdapter
 import com.asparrin.carlos.estiloya.ui.components.CategoriasAdapter
+import com.asparrin.carlos.estiloya.ui.components.CantidadDialog
 import com.asparrin.carlos.estiloya.ui.components.ProductAdapter
+import com.asparrin.carlos.estiloya.ui.disenar.DisenarActivity
+import com.asparrin.carlos.estiloya.ui.perfil.PerfilActivity
 import com.asparrin.carlos.estiloya.ui.productos.DetalleProductoActivity
 import com.asparrin.carlos.estiloya.ui.productos.ProductosActivity
-import com.asparrin.carlos.estiloya.ui.disenar.MisDisenosActivity
+import com.asparrin.carlos.estiloya.viewModel.AuthState
+import com.asparrin.carlos.estiloya.viewModel.AuthViewModel
+import com.asparrin.carlos.estiloya.viewModel.CarritoViewModel
 import com.asparrin.carlos.estiloya.viewModel.HomeViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.CoroutineScope
@@ -47,34 +56,47 @@ class HomeActivity : BaseActivity() {
     private lateinit var nuevosProductosAdapter: ProductAdapter
     private lateinit var productosFiltradosAdapter: ProductAdapter
     
-    // ViewModel
+    // ViewModels
     private val homeViewModel: HomeViewModel by lazy {
         androidx.lifecycle.ViewModelProvider(this)[HomeViewModel::class.java]
+    }
+    
+    private lateinit var carritoViewModel: CarritoViewModel
+    private lateinit var authViewModel: AuthViewModel
+    
+    companion object {
+        private const val TAG = "HomeActivity"
     }
 
     // Servicio de categorías
     private val categoriaService: CategoriaService by lazy {
-        ApiClient.retrofit.create(CategoriaService::class.java)
+        ApiClient.createCategoriaService(this)
     }
 
     override fun getLayoutResourceId(): Int = R.layout.activity_home
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        
         // Asociar el binding al contenido inyectado
         val contentFrame = findViewById<FrameLayout>(R.id.content_frame)
         val child = contentFrame.getChildAt(0)
         binding = ActivityHomeBinding.bind(child)
-
+        
+        // Inicializar ViewModels
+        authViewModel = AuthViewModel(this)
+        
         setupBanners()
         setupCategorias()
         setupProductAdapters()
         setupClickListeners()
         setupObservers()
         
+        // Inicializar ViewModel del carrito
+        carritoViewModel = ViewModelProvider(this)[CarritoViewModel::class.java]
+        
         // Cargar datos
-        homeViewModel.cargarTodosLosDatos()
+        homeViewModel.cargarTodosLosDatos(this)
         cargarCategorias()
     }
 
@@ -91,7 +113,7 @@ class HomeActivity : BaseActivity() {
 
         binding.viewPagerBanners.apply {
             adapter = bannersAdapter
-            orientation = ViewPager2.ORIENTATION_HORIZONTAL
+            orientation = androidx.viewpager2.widget.ViewPager2.ORIENTATION_HORIZONTAL
         }
     }
 
@@ -105,7 +127,7 @@ class HomeActivity : BaseActivity() {
         }
 
         binding.rvCategorias.apply {
-            layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@HomeActivity, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
             adapter = categoriasAdapter
         }
     }
@@ -164,12 +186,12 @@ class HomeActivity : BaseActivity() {
                 startActivity(intent)
             },
             onAgregarClick = { producto ->
-                Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
+                mostrarDialogoCantidad(producto)
             }
         )
 
         binding.rvOfertasDelDia.apply {
-            layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@HomeActivity, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
             adapter = ofertasDelDiaAdapter
         }
 
@@ -182,12 +204,12 @@ class HomeActivity : BaseActivity() {
                 startActivity(intent)
             },
             onAgregarClick = { producto ->
-                Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
+                mostrarDialogoCantidad(producto)
             }
         )
 
         binding.rvOfertasDeLaSemana.apply {
-            layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@HomeActivity, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
             adapter = ofertasDeLaSemanaAdapter
         }
 
@@ -200,12 +222,12 @@ class HomeActivity : BaseActivity() {
                 startActivity(intent)
             },
             onAgregarClick = { producto ->
-                Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
+                mostrarDialogoCantidad(producto)
             }
         )
 
         binding.rvMasVendidos.apply {
-            layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@HomeActivity, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
             adapter = masVendidosAdapter
         }
 
@@ -218,12 +240,12 @@ class HomeActivity : BaseActivity() {
                 startActivity(intent)
             },
             onAgregarClick = { producto ->
-                Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
+                mostrarDialogoCantidad(producto)
             }
         )
 
         binding.rvNuevosProductos.apply {
-            layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@HomeActivity, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
             adapter = nuevosProductosAdapter
         }
 
@@ -236,7 +258,7 @@ class HomeActivity : BaseActivity() {
                 startActivity(intent)
             },
             onAgregarClick = { producto ->
-                Toast.makeText(this, "Agregado al carrito: ${producto.nombre}", Toast.LENGTH_SHORT).show()
+                mostrarDialogoCantidad(producto)
             }
         )
     }
@@ -248,27 +270,51 @@ class HomeActivity : BaseActivity() {
             intent.putExtra("menosDe50", true)
             startActivity(intent)
         }
+        
         // Pocas Unidades
         binding.btnPocasUnidades.setOnClickListener {
             val intent = Intent(this, ProductosActivity::class.java)
             intent.putExtra("pocasUnidades", true)
             startActivity(intent)
         }
-        // Oferta
-        binding.btnOfertas.setOnClickListener {
-            val intent = Intent(this, ProductosActivity::class.java)
-            intent.putExtra("mostrarOfertas", true)
-            startActivity(intent)
-        }
+        
         // Nuevos
         binding.btnNuevos.setOnClickListener {
             val intent = Intent(this, ProductosActivity::class.java)
-            intent.putExtra("mostrarNuevos", true)
+            intent.putExtra("nuevos", true)
             startActivity(intent)
         }
+        
+        // Ofertas
+        binding.btnOfertas.setOnClickListener {
+            val intent = Intent(this, ProductosActivity::class.java)
+            intent.putExtra("ofertas", true)
+            startActivity(intent)
+        }
+        
+
     }
 
     private fun setupObservers() {
+        // Observar estado de autenticación
+        authViewModel.authState.observe(this) { state ->
+            when (state) {
+                AuthState.NOT_AUTHENTICATED -> {
+                    Log.d(TAG, "Usuario no autenticado, navegando a Login")
+                    navigateToLogin()
+                }
+                AuthState.REQUIRES_2FA -> {
+                    Log.d(TAG, "Usuario requiere 2FA, navegando a TwoFactor")
+                    navigateToTwoFactor()
+                }
+                else -> {
+                    // Usuario autenticado, continuar normalmente
+                }
+            }
+        }
+        
+
+
         // Observar ofertas del día
         homeViewModel.ofertasDelDia.observe(this) { productos ->
             ofertasDelDiaAdapter.updateData(productos)
@@ -359,5 +405,60 @@ class HomeActivity : BaseActivity() {
         if (mensaje.isNotEmpty()) {
             Toast.makeText(this, "$mensaje (${productos.size} productos)", Toast.LENGTH_SHORT).show()
         }
+    }
+    
+    /**
+     * Mostrar diálogo para seleccionar cantidad del producto
+     */
+    private fun mostrarDialogoCantidad(producto: com.asparrin.carlos.estiloya.data.model.Producto) {
+        val cantidadDialog = CantidadDialog(this, producto) { cantidad ->
+            carritoViewModel.agregarProducto(this, producto.id, cantidad)
+        }
+        cantidadDialog.mostrar()
+    }
+
+    private fun navigateToLogin() {
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+    
+    private fun navigateToTwoFactor() {
+        val intent = Intent(this, com.asparrin.carlos.estiloya.ui.auth.TwoFactorActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_user, menu)
+        return true
+    }
+    
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_logout -> {
+                Log.d(TAG, "Usuario solicitó logout")
+                performLogout()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+    
+    private fun performLogout() {
+        // Mostrar confirmación
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Cerrar Sesión")
+            .setMessage("¿Estás seguro de que quieres cerrar sesión?")
+            .setPositiveButton("Sí") { _, _ ->
+                Log.d(TAG, "Confirmado logout")
+                authViewModel.logout()
+                Toast.makeText(this, "Sesión cerrada", Toast.LENGTH_SHORT).show()
+                navigateToLogin()
+            }
+            .setNegativeButton("No", null)
+            .show()
     }
 }

@@ -2,77 +2,160 @@ package com.asparrin.carlos.estiloya.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.asparrin.carlos.estiloya.data.mock.MockUsuario
-import com.asparrin.carlos.estiloya.data.model.Usuario
 import com.asparrin.carlos.estiloya.databinding.ActivityRegisterBinding
-import com.asparrin.carlos.estiloya.utils.SessionManager
+import com.asparrin.carlos.estiloya.ui.home.HomeActivity
+import com.asparrin.carlos.estiloya.viewModel.AuthState
+import com.asparrin.carlos.estiloya.viewModel.AuthViewModel
 
 class RegisterActivity : AppCompatActivity() {
-
+    
     private lateinit var binding: ActivityRegisterBinding
-
+    private lateinit var authViewModel: AuthViewModel
+    
+    companion object {
+        private const val TAG = "RegisterActivity"
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Configurar el botón de registrarse
+        
+        // Inicializar ViewModel
+        authViewModel = AuthViewModel(this)
+        
+        setupObservers()
+        setupClickListeners()
+    }
+    
+    private fun setupObservers() {
+        // Observar estado de autenticación
+        authViewModel.authState.observe(this) { state ->
+            when (state) {
+                AuthState.AUTHENTICATED -> {
+                    Log.d(TAG, "Usuario registrado y autenticado, navegando a Home")
+                    navigateToHome()
+                }
+                AuthState.REQUIRES_2FA -> {
+                    Log.d(TAG, "Registro requiere 2FA, navegando a TwoFactorActivity")
+                    navigateToTwoFactor()
+                }
+                AuthState.NOT_AUTHENTICATED -> {
+                    Log.d(TAG, "Usuario no autenticado")
+                }
+                AuthState.LOADING -> {
+                    Log.d(TAG, "Cargando...")
+                }
+            }
+        }
+        
+        // Observar estado de carga
+        authViewModel.isLoading.observe(this) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+            binding.registerButton.isEnabled = !isLoading
+        }
+        
+        // Observar mensajes de error
+        authViewModel.errorMessage.observe(this) { errorMessage ->
+            if (!errorMessage.isNullOrEmpty()) {
+                Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+                Log.e(TAG, "Error: $errorMessage")
+            }
+        }
+        
+        // Observar resultado de registro
+        authViewModel.registerResult.observe(this) { response ->
+            if (response.success) {
+                if (response.requires2FA) {
+                    Toast.makeText(this, "Registro exitoso. Se requiere verificación 2FA", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                val message = response.message ?: "Error desconocido en el registro"
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+    
+    private fun setupClickListeners() {
         binding.registerButton.setOnClickListener {
-            val correo = binding.emailEditText.text.toString().trim()
             val nombre = binding.nombreEditText.text.toString().trim()
             val apellidos = binding.apellidosEditText.text.toString().trim()
+            val email = binding.emailEditText.text.toString().trim()
+            val contraseña = binding.passwordEditText.text.toString().trim()
             val telefono = binding.telefonoEditText.text.toString().trim()
-            val clave = binding.passwordEditText.text.toString()
-
-            // Validar campos vacíos
-            if (nombre.isEmpty() || apellidos.isEmpty() || correo.isEmpty() || 
-                telefono.isEmpty() || clave.isEmpty()) {
-                Toast.makeText(this, "Por favor completa todos los campos", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Validar correo institucional
-            if (!correo.endsWith("@tecsup.edu.pe")) {
-                Toast.makeText(this, "Correo debe ser institucional", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Validar longitud de contraseña
-            if (clave.length < 6) {
-                Toast.makeText(this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val nuevoUsuario = Usuario(
-                id = 0,
-                nombre = nombre,
-                apellidos = apellidos,
-                correo = correo,
-                contraseña = clave,
-                telefono = telefono,
-                rol = "USER"
-            )
-
-            val registrado = MockUsuario.registrar(nuevoUsuario)
-
-            if (registrado) {
-                // Guardar usuario en sesión
-                val session = SessionManager(this)
-                session.guardarUsuario(nuevoUsuario)
-                Toast.makeText(this, "✅ Registro exitoso", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, LoginActivity::class.java))
-                finish()
-            } else {
-                Toast.makeText(this, "❌ Este correo ya existe", Toast.LENGTH_SHORT).show()
+            
+            if (validateInputs(nombre, apellidos, email, contraseña, telefono)) {
+                Log.d(TAG, "Intentando registro con email: $email")
+                authViewModel.register(nombre, apellidos, email, contraseña, telefono)
             }
         }
-
-        // Configurar el botón "Ya tengo cuenta"
+        
         binding.loginLinkButton.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
-            finish()
         }
+    }
+    
+    private fun validateInputs(
+        nombre: String,
+        apellidos: String,
+        email: String,
+        contraseña: String,
+        telefono: String
+    ): Boolean {
+        if (nombre.isEmpty()) {
+            binding.nombreEditText.error = "El nombre es requerido"
+            return false
+        }
+        
+        if (apellidos.isEmpty()) {
+            binding.apellidosEditText.error = "Los apellidos son requeridos"
+            return false
+        }
+        
+        if (email.isEmpty()) {
+            binding.emailEditText.error = "El email es requerido"
+            return false
+        }
+        
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.emailEditText.error = "Email inválido"
+            return false
+        }
+        
+        if (contraseña.isEmpty()) {
+            binding.passwordEditText.error = "La contraseña es requerida"
+            return false
+        }
+        
+        if (contraseña.length < 6) {
+            binding.passwordEditText.error = "La contraseña debe tener al menos 6 caracteres"
+            return false
+        }
+        
+        if (telefono.isEmpty()) {
+            binding.telefonoEditText.error = "El teléfono es requerido"
+            return false
+        }
+        
+        return true
+    }
+    
+    private fun navigateToHome() {
+        val intent = Intent(this, HomeActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+    
+    private fun navigateToTwoFactor() {
+        val intent = Intent(this, TwoFactorActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

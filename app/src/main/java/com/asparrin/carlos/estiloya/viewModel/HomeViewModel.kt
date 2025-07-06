@@ -1,5 +1,6 @@
 package com.asparrin.carlos.estiloya.viewModel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -65,8 +66,7 @@ class HomeViewModel : ViewModel() {
     private val _productosFiltrados = MutableLiveData<List<Producto>>()
     val productosFiltrados: LiveData<List<Producto>> = _productosFiltrados
 
-    // Instancia del servicio Retrofit
-    private val productService: ProductService = ApiClient.retrofit.create(ProductService::class.java)
+
 
     // Lista temporal de todos los productos para filtrado
     private var todosLosProductos: List<Producto> = emptyList()
@@ -74,12 +74,13 @@ class HomeViewModel : ViewModel() {
     /**
      * Carga las ofertas del día con fallback a datos mock
      */
-    fun cargarOfertasDelDia() {
+    fun cargarOfertasDelDia(context: Context) {
         viewModelScope.launch {
             _isLoadingOfertasDia.value = true
             _errorOfertasDia.value = null
             
             try {
+                val productService = ApiClient.createProductService(context)
                 val response = productService.getOfertasDelDia()
                 Log.d("HomeViewModel", "Ofertas del día - HTTP ${response.code()}")
                 
@@ -108,12 +109,13 @@ class HomeViewModel : ViewModel() {
     /**
      * Carga las ofertas de la semana con fallback a datos mock
      */
-    fun cargarOfertasDeLaSemana() {
+    fun cargarOfertasDeLaSemana(context: Context) {
         viewModelScope.launch {
             _isLoadingOfertasSemana.value = true
             _errorOfertasSemana.value = null
             
             try {
+                val productService = ApiClient.createProductService(context)
                 val response = productService.getOfertasDeLaSemana()
                 Log.d("HomeViewModel", "Ofertas de la semana - HTTP ${response.code()}")
                 
@@ -142,12 +144,13 @@ class HomeViewModel : ViewModel() {
     /**
      * Carga los productos más vendidos con fallback a datos mock
      */
-    fun cargarProductosMasVendidos() {
+    fun cargarProductosMasVendidos(context: Context) {
         viewModelScope.launch {
             _isLoadingMasVendidos.value = true
             _errorMasVendidos.value = null
             
             try {
+                val productService = ApiClient.createProductService(context)
                 val response = productService.getProductosMasVendidos()
                 Log.d("HomeViewModel", "Productos más vendidos - HTTP ${response.code()}")
                 
@@ -176,12 +179,13 @@ class HomeViewModel : ViewModel() {
     /**
      * Carga los nuevos productos con fallback a datos mock
      */
-    fun cargarNuevosProductos() {
+    fun cargarNuevosProductos(context: Context) {
         viewModelScope.launch {
             _isLoadingNuevos.value = true
             _errorNuevos.value = null
             
             try {
+                val productService = ApiClient.createProductService(context)
                 val response = productService.getNuevosProductos()
                 Log.d("HomeViewModel", "Nuevos productos - HTTP ${response.code()}")
                 
@@ -210,9 +214,10 @@ class HomeViewModel : ViewModel() {
     /**
      * Carga todos los productos para filtrado
      */
-    fun cargarTodosLosProductos() {
+    fun cargarTodosLosProductos(context: Context) {
         viewModelScope.launch {
             try {
+                val productService = ApiClient.createProductService(context)
                 val response = productService.listAll()
                 if (response.isSuccessful) {
                     todosLosProductos = response.body()?.content ?: emptyList()
@@ -285,12 +290,12 @@ class HomeViewModel : ViewModel() {
     /**
      * Carga todos los datos del home
      */
-    fun cargarTodosLosDatos() {
-        cargarOfertasDelDia()
-        cargarOfertasDeLaSemana()
-        cargarProductosMasVendidos()
-        cargarNuevosProductos()
-        cargarTodosLosProductos() // Para filtros
+    fun cargarTodosLosDatos(context: Context) {
+        cargarOfertasDelDia(context)
+        cargarOfertasDeLaSemana(context)
+        cargarProductosMasVendidos(context)
+        cargarNuevosProductos(context)
+        cargarTodosLosProductos(context) // Para filtros
     }
 
     /**

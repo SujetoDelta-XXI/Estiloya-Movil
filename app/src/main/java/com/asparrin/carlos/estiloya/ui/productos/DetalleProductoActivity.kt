@@ -7,12 +7,16 @@ import com.asparrin.carlos.estiloya.R
 import com.asparrin.carlos.estiloya.data.model.Producto
 import com.asparrin.carlos.estiloya.databinding.ActivityDetalleProductoBinding
 import com.asparrin.carlos.estiloya.ui.base.BaseActivity
+import com.asparrin.carlos.estiloya.ui.components.CantidadDialog
+import androidx.lifecycle.ViewModelProvider
+import com.asparrin.carlos.estiloya.viewModel.CarritoViewModel
 import com.bumptech.glide.Glide
 
 class DetalleProductoActivity : BaseActivity() {
 
     private lateinit var binding: ActivityDetalleProductoBinding
     private var producto: Producto? = null
+    private lateinit var carritoViewModel: CarritoViewModel
 
     override fun getLayoutResourceId(): Int = R.layout.activity_detalle_producto
 
@@ -35,12 +39,15 @@ class DetalleProductoActivity : BaseActivity() {
         }
 
         setupListeners()
+        
+        // Inicializar ViewModel del carrito
+        carritoViewModel = ViewModelProvider(this)[CarritoViewModel::class.java]
     }
 
     private fun mostrarDetallesProducto(producto: Producto) {
         // Configurar imagen
         Glide.with(this)
-            .load(producto.imagenUrl)
+            .load(producto.imagen)
             .placeholder(R.drawable.ic_producto)
             .error(R.drawable.ic_producto)
             .into(binding.imageProducto)
@@ -48,7 +55,7 @@ class DetalleProductoActivity : BaseActivity() {
         // Configurar información básica
         binding.textNombre.text = producto.nombre
         binding.textDescripcion.text = producto.descripcion
-        binding.textCategoria.text = producto.categoria
+        binding.textCategoria.text = producto.categoriaNombre
         binding.textTipo.text = producto.tipo
         binding.textId.text = producto.id.toString()
 
@@ -77,11 +84,25 @@ class DetalleProductoActivity : BaseActivity() {
 
     private fun setupListeners() {
         binding.btnAgregar.setOnClickListener {
-            Toast.makeText(this, "Agregado al carrito: ${producto?.nombre}", Toast.LENGTH_SHORT).show()
+            producto?.let { mostrarDialogoCantidad(it) }
         }
 
         binding.btnComprar.setOnClickListener {
-            Toast.makeText(this, "Comprando: ${producto?.nombre}", Toast.LENGTH_SHORT).show()
+            producto?.let { 
+                // Agregar 1 unidad y ir al carrito
+                carritoViewModel.agregarProducto(this, it.id, 1)
+                Toast.makeText(this, "Producto agregado al carrito", Toast.LENGTH_SHORT).show()
+            }
         }
+    }
+    
+    /**
+     * Mostrar diálogo para seleccionar cantidad del producto
+     */
+    private fun mostrarDialogoCantidad(producto: Producto) {
+        val cantidadDialog = CantidadDialog(this, producto) { cantidad ->
+            carritoViewModel.agregarProducto(this, producto.id, cantidad)
+        }
+        cantidadDialog.mostrar()
     }
 } 

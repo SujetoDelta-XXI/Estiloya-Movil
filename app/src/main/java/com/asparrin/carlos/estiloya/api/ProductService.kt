@@ -10,43 +10,43 @@ interface ProductService {
   /**
    * Ahora devolvemos PaginatedResponse<Producto> en lugar de List<Producto>.
    */
-  @GET("productos")
+  @GET("usuario/productos")
   suspend fun listAll(): Response<PaginatedResponse<Producto>>
 
   /**
    * Ofertas del día - devuelve array directo
    */
-  @GET("productos/ofertas-dia")
+  @GET("usuario/productos/ofertas-dia")
   suspend fun getOfertasDelDia(): Response<List<Producto>>
 
   /**
    * Ofertas de la semana - devuelve array directo
    */
-  @GET("productos/ofertas-semana")
+  @GET("usuario/productos/ofertas-semana")
   suspend fun getOfertasDeLaSemana(): Response<List<Producto>>
 
   /**
    * Productos más vendidos - devuelve array directo
    */
-  @GET("productos/mas-vendidos")
+  @GET("usuario/productos/mas-vendidos")
   suspend fun getProductosMasVendidos(): Response<List<Producto>>
 
   /**
    * Nuevos productos - devuelve array directo
    */
-  @GET("productos/nuevos")
+  @GET("usuario/productos/nuevos")
   suspend fun getNuevosProductos(): Response<List<Producto>>
 
   // Endpoints alternativos que devuelven PaginatedResponse (por si acaso)
-  @GET("productos/ofertas-dia-paginated")
+  @GET("usuario/productos/ofertas-dia-paginated")
   suspend fun getOfertasDelDiaPaginated(): Response<PaginatedResponse<Producto>>
 
-  @GET("productos/ofertas-semana-paginated")
+  @GET("usuario/productos/ofertas-semana-paginated")
   suspend fun getOfertasDeLaSemanaPaginated(): Response<PaginatedResponse<Producto>>
 
-  @GET("productos/mas-vendidos-paginated")
+  @GET("usuario/productos/mas-vendidos-paginated")
   suspend fun getProductosMasVendidosPaginated(): Response<PaginatedResponse<Producto>>
 
-  @GET("productos/nuevos-paginated")
+  @GET("usuario/productos/nuevos-paginated")
   suspend fun getNuevosProductosPaginated(): Response<PaginatedResponse<Producto>>
 }
